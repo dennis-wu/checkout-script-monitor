@@ -1,0 +1,14 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+.idea/
+.vscode/
+
+# Dependencies / build (none in MVP; future-proofing)
+/vendor/
+/node_modules/
+
+# Packaged builds
+*.zip
