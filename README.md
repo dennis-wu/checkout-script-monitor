@@ -16,7 +16,7 @@ affiliated with or endorsed by the PCI Security Standards Council.
 - **CSP Report-Only** (off by default) — emits a `Content-Security-Policy-Report-Only`
   header on cart/checkout, built from a **baseline of the merchant's own observed
   scripts** (never an opinionated "trusted sources" default), with a local REST
-  endpoint (`/wp-json/css-script-guard/v1/csp-report`) storing violations in the
+  endpoint (`/wp-json/checkout-script-monitor/v1/csp-report`) storing violations in the
   site's own database. Visitor IP and referrer are dropped at ingest. Report-Only
   never blocks anything.
 
@@ -25,14 +25,14 @@ affiliated with or endorsed by the PCI Security Standards Council.
 **From a release zip**
 
 1. In WordPress: **Plugins → Add New Plugin → Upload Plugin**, choose
-   `css-script-guard.zip`, **Install Now**, then **Activate**.
+   `checkout-script-monitor.zip`, **Install Now**, then **Activate**.
 2. A **Checkout Script Monitor** menu appears in the admin sidebar.
 
 **From source**
 
 ```bash
-git clone https://github.com/dennis-wu/css-script-guard.git \
-  wp-content/plugins/css-script-guard
+git clone https://github.com/dennis-wu/checkout-script-monitor.git \
+  wp-content/plugins/checkout-script-monitor
 ```
 
 Then activate it from **Plugins**.
@@ -59,12 +59,12 @@ the cart/checkout pages).
 ## Structure
 
 ```
-css-script-guard.php         Bootstrap: header, constants, activation
-includes/class-inventory.php Scan + parse + classify + SRI + snapshot
-includes/class-csp.php       Report-Only header + REST report endpoint + storage
-includes/class-admin.php     Admin menus and screens
-uninstall.php                Removes options + violations table
-readme.txt                   wordpress.org listing
+checkout-script-monitor.php   Bootstrap: header, constants, activation
+includes/class-inventory.php  Scan + parse + classify + SRI + snapshot
+includes/class-csp.php        Report-Only header + REST report endpoint + storage
+includes/class-admin.php      Admin menus and screens
+uninstall.php                 Removes options + violations table
+readme.txt                    wordpress.org listing
 ```
 
 ## License

@@ -8,28 +8,28 @@
  * stored on the merchant's own site. The visitor IP and referrer are dropped at
  * ingest. Nothing leaves the site.
  *
- * @package CSS_Script_Guard
+ * @package Checkout_Script_Monitor
  */
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Class CSG_CSP.
+ * Class CSM_CSP.
  */
-class CSG_CSP {
+class CSM_CSP {
 
-	const REST_NS    = 'css-script-guard/v1';
+	const REST_NS    = 'checkout-script-monitor/v1';
 	const REST_ROUTE = '/csp-report';
 	const MAX_BODY   = 8192; // 8 KB cap on a report body.
 	const RATE_MAX   = 300;  // Max reports stored per minute (global).
 	const KEEP_ROWS  = 500;  // Prune the violations table to this many rows.
 
 	/**
-	 * @var CSG_Inventory
+	 * @var CSM_Inventory
 	 */
 	private $inventory;
 
-	public function __construct( CSG_Inventory $inventory ) {
+	public function __construct( CSM_Inventory $inventory ) {
 		$this->inventory = $inventory;
 	}
 
@@ -44,7 +44,7 @@ class CSG_CSP {
 	}
 
 	private function settings() {
-		$s = get_option( CSG_OPT_SETTINGS, array() );
+		$s = get_option( CSM_OPT_SETTINGS, array() );
 		return wp_parse_args( is_array( $s ) ? $s : array(), array( 'csp_report_only' => 0 ) );
 	}
 
@@ -59,7 +59,7 @@ class CSG_CSP {
 	 * @return array
 	 */
 	public function get_baseline() {
-		$b = get_option( CSG_OPT_BASELINE, array() );
+		$b = get_option( CSM_OPT_BASELINE, array() );
 		return is_array( $b ) ? $b : array();
 	}
 
@@ -73,7 +73,7 @@ class CSG_CSP {
 			'hosts'      => array_values( array_unique( $this->inventory->snapshot_hosts() ) ),
 			'created_at' => current_time( 'mysql' ),
 		);
-		update_option( CSG_OPT_BASELINE, $baseline, false );
+		update_option( CSM_OPT_BASELINE, $baseline, false );
 		return $baseline;
 	}
 
@@ -139,7 +139,7 @@ class CSG_CSP {
 	 */
 	public function receive_report( WP_REST_Request $request ) {
 		// Crude global rate limit to blunt floods (this endpoint is public).
-		$bucket = 'csg_rl_' . gmdate( 'YmdHi' );
+		$bucket = 'csm_rl_' . gmdate( 'YmdHi' );
 		$count  = (int) get_transient( $bucket );
 		if ( $count >= self::RATE_MAX ) {
 			return new WP_REST_Response( null, 429 );
@@ -252,7 +252,7 @@ class CSG_CSP {
 
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'csg_violations';
+		return $wpdb->prefix . 'csm_violations';
 	}
 
 	public static function install_table() {

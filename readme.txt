@@ -28,7 +28,7 @@ Privacy: Checkout Script Monitor makes no outbound connections except scanning y
 
 == Installation ==
 
-1. Upload the plugin to `/wp-content/plugins/css-script-guard`, or install it from the Plugins screen.
+1. Upload the plugin to `/wp-content/plugins/checkout-script-monitor`, or install it from the Plugins screen.
 2. Activate it.
 3. Open **Checkout Script Monitor > Inventory & 6.4.3** and click **Scan my store**.
 4. Review the list and remove anything you do not need.

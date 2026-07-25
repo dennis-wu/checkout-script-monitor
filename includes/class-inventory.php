@@ -3,15 +3,15 @@
  * Script inventory: scans the merchant's OWN store pages and records the
  * external scripts loaded on them. No third-party or phone-home requests.
  *
- * @package CSS_Script_Guard
+ * @package Checkout_Script_Monitor
  */
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Class CSG_Inventory.
+ * Class CSM_Inventory.
  */
-class CSG_Inventory {
+class CSM_Inventory {
 
 	/**
 	 * Compact third-party catalog: host substring => array( category, label ).
@@ -80,7 +80,7 @@ class CSG_Inventory {
 				$url,
 				array(
 					'timeout'    => 15,
-					'user-agent' => 'ScriptGuard/' . CSG_VERSION . ' (+https://cybershieldstudio.com)',
+					'user-agent' => 'ScriptGuard/' . CSM_VERSION . ' (+https://cybershieldstudio.com)',
 				)
 			);
 
@@ -91,7 +91,7 @@ class CSG_Inventory {
 			$code = (int) wp_remote_retrieve_response_code( $res );
 			if ( $code >= 400 ) {
 				/* translators: %d: HTTP status code. */
-				$errors[ $label ] = sprintf( __( 'HTTP %d', 'css-script-guard' ), $code );
+				$errors[ $label ] = sprintf( __( 'HTTP %d', 'checkout-script-monitor' ), $code );
 				continue;
 			}
 
@@ -138,7 +138,7 @@ class CSG_Inventory {
 			'missing_sri' => $missing,
 			'errors'      => $errors,
 		);
-		update_option( CSG_OPT_INVENTORY, $snapshot, false );
+		update_option( CSM_OPT_INVENTORY, $snapshot, false );
 		return $snapshot;
 	}
 
@@ -233,7 +233,7 @@ class CSG_Inventory {
 	 * @return array
 	 */
 	public function get_snapshot() {
-		$snap = get_option( CSG_OPT_INVENTORY, array() );
+		$snap = get_option( CSM_OPT_INVENTORY, array() );
 		return is_array( $snap ) ? $snap : array();
 	}
 
