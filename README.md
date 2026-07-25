@@ -1,4 +1,4 @@
-# Script Guard for WooCommerce
+# Checkout Script Monitor for WooCommerce
 
 A free, open-source WordPress/WooCommerce plugin that inventories the scripts on a
 merchant's checkout and shows where they stand on **PCI DSS 6.4.3**, in plain
@@ -26,7 +26,7 @@ affiliated with or endorsed by the PCI Security Standards Council.
 
 1. In WordPress: **Plugins → Add New Plugin → Upload Plugin**, choose
    `css-script-guard.zip`, **Install Now**, then **Activate**.
-2. A **Script Guard** menu appears in the admin sidebar.
+2. A **Checkout Script Monitor** menu appears in the admin sidebar.
 
 **From source**
 
@@ -42,7 +42,7 @@ the cart/checkout pages).
 
 ## Usage
 
-1. **Script Guard → Inventory & 6.4.3 → Scan my store** to build the inventory.
+1. **Checkout Script Monitor → Inventory & 6.4.3 → Scan my store** to build the inventory.
 2. Review it, then **Set baseline from my latest scan**.
 3. Optionally enable **CSP Report-Only** in Settings. New or changed scripts on
    checkout then appear under **Violations** as drift to review.

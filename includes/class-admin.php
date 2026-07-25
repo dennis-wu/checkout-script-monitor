@@ -40,12 +40,12 @@ class CSG_Admin {
 	public function menu() {
 		$cap = 'manage_options';
 		add_menu_page(
-			__( 'Script Guard', 'css-script-guard' ),
-			__( 'Script Guard', 'css-script-guard' ),
+			__( 'Checkout Script Monitor', 'css-script-guard' ),
+			__( 'Checkout Script Monitor', 'css-script-guard' ),
 			$cap,
 			'css-script-guard',
 			array( $this, 'render_inventory' ),
-			'dashicons-shield-alt',
+			'dashicons-visibility',
 			58
 		);
 		add_submenu_page( 'css-script-guard', __( 'Inventory & 6.4.3', 'css-script-guard' ), __( 'Inventory & 6.4.3', 'css-script-guard' ), $cap, 'css-script-guard', array( $this, 'render_inventory' ) );
@@ -154,7 +154,7 @@ class CSG_Admin {
 		$snap = $this->inventory->get_snapshot();
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Script Guard — Inventory & PCI DSS 6.4.3', 'css-script-guard' ); ?></h1>
+			<h1><?php esc_html_e( 'Checkout Script Monitor — Inventory & PCI DSS 6.4.3', 'css-script-guard' ); ?></h1>
 			<?php $this->notice_text(); ?>
 			<p><?php esc_html_e( 'This scans your own store pages and lists the scripts loading on them, so you can see what runs on your checkout and where you stand on Requirement 6.4.3. It is a readiness and visibility tool. It does not make you PCI compliant; that decision stays yours.', 'css-script-guard' ); ?></p>
 
@@ -235,7 +235,7 @@ class CSG_Admin {
 		$rows     = $this->csp->recent_violations( 100 );
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Script Guard — Violations (drift)', 'css-script-guard' ); ?></h1>
+			<h1><?php esc_html_e( 'Checkout Script Monitor — Violations (drift)', 'css-script-guard' ); ?></h1>
 			<?php $this->notice_text(); ?>
 			<p><?php esc_html_e( 'When CSP Report-Only is on, your visitors\' browsers report any script that is not in your confirmed baseline. Nothing is blocked; these are reports only. A new or changed script here is worth a look: it may be a legitimate addition, or a sign something changed on your checkout without you knowing.', 'css-script-guard' ); ?></p>
 
@@ -288,7 +288,7 @@ class CSG_Admin {
 		$baseline = $this->csp->get_baseline();
 		?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Script Guard — Settings', 'css-script-guard' ); ?></h1>
+			<h1><?php esc_html_e( 'Checkout Script Monitor — Settings', 'css-script-guard' ); ?></h1>
 			<?php $this->notice_text(); ?>
 
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
