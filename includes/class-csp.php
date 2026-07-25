@@ -98,7 +98,14 @@ class CSG_CSP {
 			return; // Do not emit an empty policy that flags everything.
 		}
 
-		$sources = array( "'self'" );
+		// 'unsafe-inline' is intentional here. This tool watches for off-baseline
+		// script LOADS (the 6.4.3 / Magecart drift signal), not the site's own
+		// inline <script> blocks — a WooCommerce checkout renders dozens of
+		// legitimate ones, and without per-script hashes they can't be told apart
+		// from a real threat, so they are pure noise. Allowing inline stops the
+		// browser reporting it. Because the header is Report-Only (never enforced),
+		// this has NO security effect; it only focuses reports on external hosts.
+		$sources = array( "'self'", "'unsafe-inline'" );
 		foreach ( $baseline['hosts'] as $host ) {
 			$host = preg_replace( '/[^a-z0-9.\-]/i', '', (string) $host );
 			if ( '' !== $host ) {
@@ -165,7 +172,13 @@ class CSG_CSP {
 		$document  = $this->pick( $report, array( 'document-uri', 'documentURL' ) );
 		$sample    = $this->pick( $report, array( 'script-sample', 'sample' ) );
 
-		if ( '' === $blocked && '' === $directive ) {
+		// Only record script LOADS from a network host — the drift signal. Inline
+		// or eval violations are reported as a bare token ("inline", "eval",
+		// "data", "blob", ...) with no URL scheme; that is the site's own code and
+		// pure noise on a checkout, so drop it. ('unsafe-inline' in the policy
+		// already suppresses most of it at the browser; this is the safety net.)
+		$is_network_load = ( false !== strpos( $blocked, '://' ) ) || ( '//' === substr( $blocked, 0, 2 ) );
+		if ( ! $is_network_load ) {
 			return new WP_REST_Response( null, 204 );
 		}
 
