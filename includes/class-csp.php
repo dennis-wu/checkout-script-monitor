@@ -34,7 +34,12 @@ class CSG_CSP {
 	}
 
 	public function hooks() {
-		add_action( 'send_headers', array( $this, 'maybe_send_header' ) );
+		// template_redirect (not send_headers): send_headers fires BEFORE the main
+		// query runs, so is_cart()/is_checkout() are still false there and the
+		// header would never emit on the payment path. template_redirect runs after
+		// the query, before any output, so the conditionals are reliable and
+		// header() still works.
+		add_action( 'template_redirect', array( $this, 'maybe_send_header' ) );
 		add_action( 'rest_api_init', array( $this, 'register_route' ) );
 	}
 

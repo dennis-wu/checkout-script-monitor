@@ -12,3 +12,6 @@ Thumbs.db
 
 # Packaged builds
 *.zip
+
+# wp-env — commit .wp-env.json, ignore personal local overrides
+.wp-env.override.json

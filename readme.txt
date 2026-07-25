@@ -4,7 +4,7 @@ Tags: pci, security, content security policy, subresource integrity, checkout
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ The scan reads scripts written into the page HTML. Scripts injected later by oth
 To your own WordPress site's database. Nothing is sent to a third party. A future opt-in version may offer a hosted collector, disclosed separately.
 
 == Changelog ==
+
+= 0.1.1 =
+* Fix: the CSP Report-Only header now emits reliably on the cart/checkout pages. It was gated on a conditional (is_cart/is_checkout) evaluated too early in the request, so the header never went out. Moved header emission to template_redirect, where the page conditionals are reliable.
 
 = 0.1.0 =
 * Initial release: script inventory across home/shop/cart/checkout, plain-English PCI 6.4.3 readout, and optional CSP Report-Only monitoring with a self-baselined allowlist and local violation storage.
