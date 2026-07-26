@@ -122,8 +122,19 @@ class CSM_CSP {
 		$sources = array( "'self'", "'unsafe-inline'" );
 		foreach ( $baseline['hosts'] as $host ) {
 			$host = preg_replace( '/[^a-z0-9.\-]/i', '', (string) $host );
-			if ( '' !== $host ) {
-				$sources[] = $host;
+			if ( '' === $host ) {
+				continue;
+			}
+			$sources[] = $host;
+			// Treat an apex domain and its www. subdomain as equivalent: a trusted
+			// "example.com" should also cover "www.example.com" and vice versa. CSP
+			// host-source matching is exact and never implies www, and the scanner
+			// stores the www-stripped host, so without this a script loaded from
+			// www.<domain> would be reported as off-baseline (a false positive).
+			if ( 0 === strpos( $host, 'www.' ) ) {
+				$sources[] = substr( $host, 4 );
+			} elseif ( 1 === substr_count( $host, '.' ) ) {
+				$sources[] = 'www.' . $host;
 			}
 		}
 		$report_uri = esc_url_raw( rest_url( self::REST_NS . self::REST_ROUTE ) );
