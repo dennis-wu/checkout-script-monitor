@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.1
+Stable tag: 0.3.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,6 +73,9 @@ To your own WordPress site's database. Nothing is sent to a third party. A futur
 4. Your trusted script sources and the monitoring toggle.
 
 == Changelog ==
+
+= 0.3.2 =
+* The trusted list now stores the exact host each script loads from, including any "www." prefix, so a trusted domain matches what you see in the script list (e.g. www.googletagmanager.com, not googletagmanager.com). First-party detection still treats www and non-www as the same site. Root-cause follow-up to 0.3.1.
 
 = 0.3.1 =
 * Fix a false positive: a trusted domain now also covers its "www." form (and vice versa). Trusting "googletagmanager.com" no longer flags "www.googletagmanager.com" as a new script. CSP host matching is exact and does not imply www, so the policy now emits both.

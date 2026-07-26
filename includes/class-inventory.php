@@ -71,7 +71,7 @@ class CSM_Inventory {
 	 * @return array The snapshot.
 	 */
 	public function scan() {
-		$site_host = $this->normalize_host( wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$site_host = strtolower( (string) wp_parse_url( home_url(), PHP_URL_HOST ) );
 		$scripts   = array(); // keyed by src to de-dup across pages.
 		$errors    = array();
 
@@ -99,7 +99,7 @@ class CSM_Inventory {
 			foreach ( $this->extract_scripts( $html, $url ) as $item ) {
 				$src = $item['src'];
 				if ( ! isset( $scripts[ $src ] ) ) {
-					$item['host']        = $this->normalize_host( wp_parse_url( $src, PHP_URL_HOST ) );
+					$item['host']        = strtolower( (string) wp_parse_url( $src, PHP_URL_HOST ) );
 					$item['third_party'] = $this->is_third_party( $item['host'], $site_host );
 					$vendor              = $this->match_vendor( $item['host'] . ' ' . $src );
 					$item['category']    = $vendor[0];
@@ -208,6 +208,10 @@ class CSM_Inventory {
 	}
 
 	private function is_third_party( $host, $site_host ) {
+		// Compare with www. stripped so www.mystore.com counts as first-party to
+		// mystore.com. The stored host itself keeps its real form (see scan()).
+		$host      = $this->normalize_host( $host );
+		$site_host = $this->normalize_host( $site_host );
 		if ( '' === $host || '' === $site_host ) {
 			return true;
 		}
