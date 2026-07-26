@@ -319,7 +319,12 @@ class CSM_Admin {
 				<?php foreach ( $snap['scripts'] as $s ) : ?>
 					<tr>
 						<td><code style="font-size:12px;"><?php echo esc_html( $s['src'] ); ?></code></td>
-						<td><?php echo esc_html( $this->loaded_by( $s ) ); ?></td>
+						<td>
+								<?php echo esc_html( $this->loaded_by( $s ) ); ?>
+								<?php if ( ! empty( $s['third_party'] ) ) : ?>
+									<span style="color:#996800;font-size:11px;white-space:nowrap;">&middot; <?php echo esc_html__( 'external', 'checkout-script-monitor' ); ?></span>
+								<?php endif; ?>
+							</td>
 						<td><?php
 							if ( ! empty( $s['has_sri'] ) ) {
 								echo '<span style="color:#008a20;">' . esc_html__( 'Locked', 'checkout-script-monitor' ) . '</span>';
@@ -331,17 +336,17 @@ class CSM_Admin {
 				<?php endforeach; ?>
 				</tbody>
 			</table>
-			<p class="description" style="max-width:750px;"><?php esc_html_e( '"Loaded by" tells you whose code it is. "Tamper check" is an optional extra lock some providers offer; a missing one is common and not itself a problem.', 'checkout-script-monitor' ); ?></p>
+			<p class="description" style="max-width:750px;"><?php esc_html_e( '"Loaded by" names the source of each script: a WordPress component or one of your own plugins/themes for first-party scripts, or the outside company for anything marked external. "Tamper check" is an optional extra lock some providers offer; a missing one is common and not itself a problem.', 'checkout-script-monitor' ); ?></p>
 		<?php endif; ?>
 		<?php
 	}
 
 	private function loaded_by( $s ) {
+		if ( ! empty( $s['source'] ) ) {
+			return $s['source'];
+		}
 		if ( empty( $s['third_party'] ) ) {
 			return __( 'Your store', 'checkout-script-monitor' );
-		}
-		if ( ! empty( $s['vendor'] ) ) {
-			return $s['vendor'];
 		}
 		return __( 'Another company', 'checkout-script-monitor' );
 	}

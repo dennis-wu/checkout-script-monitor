@@ -104,6 +104,7 @@ class CSM_Inventory {
 					$vendor              = $this->match_vendor( $item['host'] . ' ' . $src );
 					$item['category']    = $vendor[0];
 					$item['vendor']      = $vendor[1];
+					$item['source']      = $item['third_party'] ? $vendor[1] : $this->first_party_source( $src );
 					$item['pages']       = array( $label );
 					$scripts[ $src ]     = $item;
 				} elseif ( ! in_array( $label, $scripts[ $src ]['pages'], true ) ) {
@@ -225,6 +226,85 @@ class CSM_Inventory {
 			}
 		}
 		return array( '', '' );
+	}
+
+	/**
+	 * Friendly name for a FIRST-PARTY script based on its path: WordPress core,
+	 * the installed plugin's real display name, the theme, etc. Empty when the
+	 * path is not a recognizable WordPress location (caller falls back to
+	 * "Your store").
+	 *
+	 * @param string $src Absolute script URL.
+	 * @return string
+	 */
+	private function first_party_source( $src ) {
+		$path = strtolower( (string) wp_parse_url( $src, PHP_URL_PATH ) );
+		if ( false !== strpos( $path, '/wp-includes/js/jquery/' ) ) {
+			return __( 'jQuery (WordPress core)', 'checkout-script-monitor' );
+		}
+		if ( preg_match( '#/wp-(?:includes|admin)/#', $path ) ) {
+			return __( 'WordPress core', 'checkout-script-monitor' );
+		}
+		if ( preg_match( '#/wp-content/plugins/([^/]+)/#', $path, $m ) ) {
+			return $this->plugin_name( $m[1] );
+		}
+		if ( false !== strpos( $path, '/wp-content/mu-plugins/' ) ) {
+			return __( 'Must-use plugin', 'checkout-script-monitor' );
+		}
+		if ( preg_match( '#/wp-content/themes/([^/]+)/#', $path, $m ) ) {
+			return $this->theme_name( $m[1] );
+		}
+		return '';
+	}
+
+	/**
+	 * Real display name of an installed plugin by directory slug, or a
+	 * prettified slug if it is not in the registry.
+	 */
+	private function plugin_name( $slug ) {
+		$names = $this->installed_plugin_names();
+		return isset( $names[ $slug ] ) ? $names[ $slug ] : $this->prettify_slug( $slug );
+	}
+
+	/**
+	 * Map of plugin directory slug => display Name, from the WordPress registry.
+	 * Cached for the request.
+	 *
+	 * @return array<string,string>
+	 */
+	private function installed_plugin_names() {
+		static $map = null;
+		if ( null !== $map ) {
+			return $map;
+		}
+		$map = array();
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		foreach ( get_plugins() as $file => $data ) {
+			$slug = strtok( (string) $file, '/' );
+			if ( $slug && ! isset( $map[ $slug ] ) && ! empty( $data['Name'] ) ) {
+				$map[ $slug ] = $data['Name'];
+			}
+		}
+		return $map;
+	}
+
+	private function theme_name( $slug ) {
+		$name = '';
+		if ( function_exists( 'wp_get_theme' ) ) {
+			$theme = wp_get_theme( $slug );
+			$name  = $theme ? (string) $theme->get( 'Name' ) : '';
+		}
+		if ( '' === $name ) {
+			$name = $this->prettify_slug( $slug );
+		}
+		/* translators: %s: theme name. */
+		return sprintf( __( '%s (theme)', 'checkout-script-monitor' ), $name );
+	}
+
+	private function prettify_slug( $slug ) {
+		return ucwords( str_replace( array( '-', '_' ), ' ', (string) $slug ) );
 	}
 
 	/**

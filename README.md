@@ -10,8 +10,9 @@ affiliated with or endorsed by the PCI Security Standards Council.
 ## What it does
 
 - **Script inventory** — scans the store's own home/shop/cart/checkout pages
-  (`wp_remote_get`), parses `<script src>`, classifies first- vs third-party, tags
-  vendor/category, and records SRI status.
+  (`wp_remote_get`), parses `<script src>`, classifies first- vs third-party, names
+  the source (WordPress core, the installed plugin/theme via `get_plugins()` /
+  `wp_get_theme()`, or the external vendor via a host catalog), and records SRI status.
 - **6.4.3 readout** — counts, a per-script table, and plain-English guidance.
 - **Drift monitoring** (off by default) — emits a `Content-Security-Policy-Report-Only`
   header on cart/checkout, built from the merchant's **trusted list** (their own

@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.2.1
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,7 +18,7 @@ Checkout Script Monitor gives you that visibility. It scans your own store pages
 
 What it does:
 
-* **Script inventory for your checkout.** Scans your home, shop, cart, and checkout pages and lists every external script, marked first-party or third-party, tagged by vendor and category, with its integrity (SRI) status.
+* **Script inventory for your checkout.** Scans your home, shop, cart, and checkout pages and lists every external script, named by source (the WordPress plugin, theme, or core component for your own scripts, or the outside vendor for external ones), with its integrity (SRI) status.
 * **Plain-English PCI 6.4.3 readout.** Counts your scripts, flags the ones missing an integrity check, and explains in merchant language what Requirement 6.4.3 asks and what to do.
 * **Drift monitoring (optional, off by default).** Emits a `Content-Security-Policy-Report-Only` header on the cart and checkout, built from a baseline of the scripts already on **your own** site. It never blocks anything. When a new or changed script appears, your browser reports it, so you can catch drift, the early signal of a skimmer, a rogue plugin update, or an unexpected third party.
 
@@ -73,6 +73,9 @@ To your own WordPress site's database. Nothing is sent to a third party. A futur
 4. Your trusted script sources and the monitoring toggle.
 
 == Changelog ==
+
+= 0.3.0 =
+* The scan now names the source of every script. Your own scripts are labeled by their WordPress plugin, theme, or core component (read from your actually installed plugins, so any plugin is recognized, not just popular ones), and outside scripts are tagged "external" next to the vendor. Much easier to recognize what runs on your checkout at a glance.
 
 = 0.2.1 =
 * The trusted list is now sticky. "Add anything new from my latest scan" merges new domains and never removes ones you already trust, so a script that is temporarily unavailable (or a manually-trusted domain) can no longer be dropped by a re-scan. Added a per-domain Remove button for deliberate pruning, and clarified that the list holds domains.
