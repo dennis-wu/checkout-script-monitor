@@ -37,6 +37,7 @@ class CSM_Admin {
 		add_action( 'admin_post_csm_rebaseline', array( $this, 'handle_rebaseline' ) );
 		add_action( 'admin_post_csm_enable_monitoring', array( $this, 'handle_enable_monitoring' ) );
 		add_action( 'admin_post_csm_trust', array( $this, 'handle_trust' ) );
+		add_action( 'admin_post_csm_untrust', array( $this, 'handle_untrust' ) );
 		add_action( 'admin_post_csm_clear_violations', array( $this, 'handle_clear_violations' ) );
 		add_action( 'admin_post_csm_dismiss_notice', array( $this, 'handle_dismiss_notice' ) );
 		add_action( 'admin_notices', array( $this, 'funnel_notice' ) );
@@ -128,6 +129,16 @@ class CSM_Admin {
 		$this->redirect( 'checkout-script-monitor-alerts', 'trusted' );
 	}
 
+	public function handle_untrust() {
+		$this->guard();
+		check_admin_referer( 'csm_untrust' );
+		$host = isset( $_POST['host'] ) ? sanitize_text_field( wp_unslash( $_POST['host'] ) ) : '';
+		if ( '' !== $host ) {
+			$this->csp->remove_baseline_host( $host );
+		}
+		$this->redirect( 'checkout-script-monitor', 'untrusted' );
+	}
+
 	public function handle_clear_violations() {
 		$this->guard();
 		check_admin_referer( 'csm_clear_violations' );
@@ -152,6 +163,7 @@ class CSM_Admin {
 			'rebaselined'   => __( 'Your trusted list is saved.', 'checkout-script-monitor' ),
 			'cleared'       => __( 'Alerts cleared.', 'checkout-script-monitor' ),
 			'trusted'       => __( 'Added to your trusted list. We will not alert you about it again.', 'checkout-script-monitor' ),
+			'untrusted'     => __( 'Removed from your trusted list.', 'checkout-script-monitor' ),
 			'monitoring_on' => __( 'Monitoring is on. We will alert you if a new script appears on your checkout.', 'checkout-script-monitor' ),
 		);
 		if ( isset( $map[ $k ] ) ) {
@@ -336,24 +348,40 @@ class CSM_Admin {
 
 	private function render_trusted_list( $baseline, $post_url ) {
 		?>
-		<h2><?php esc_html_e( 'Your trusted scripts', 'checkout-script-monitor' ); ?></h2>
-		<p>
+		<h2><?php esc_html_e( 'Your trusted script sources', 'checkout-script-monitor' ); ?></h2>
+		<p style="max-width:750px;">
 			<?php
 			/* translators: %s: date the trusted list was saved. */
-			printf( esc_html__( 'Saved on %s. We only alert you about scripts that are not on this list.', 'checkout-script-monitor' ), esc_html( $baseline['created_at'] ) );
+			printf( esc_html__( 'Saved on %s. These are the domains (website addresses) your checkout is allowed to load scripts from. We only alert you about scripts from anywhere else.', 'checkout-script-monitor' ), esc_html( $baseline['created_at'] ) );
 			?>
 		</p>
-		<ul style="list-style:disc;margin:0 0 12px 20px;">
+		<table class="widefat striped" style="max-width:600px;">
+			<thead><tr>
+				<th><?php esc_html_e( 'Trusted domain', 'checkout-script-monitor' ); ?></th>
+				<th style="width:90px;"></th>
+			</tr></thead>
+			<tbody>
 			<?php foreach ( $baseline['hosts'] as $h ) : ?>
-				<li><code><?php echo esc_html( $h ); ?></code></li>
+				<tr>
+					<td><code><?php echo esc_html( $h ); ?></code></td>
+					<td>
+						<form method="post" action="<?php echo $post_url; // phpcs:ignore ?>" style="margin:0;">
+							<input type="hidden" name="action" value="csm_untrust" />
+							<input type="hidden" name="host" value="<?php echo esc_attr( $h ); ?>" />
+							<?php wp_nonce_field( 'csm_untrust' ); ?>
+							<?php submit_button( __( 'Remove', 'checkout-script-monitor' ), 'secondary small', 'submit', false ); ?>
+						</form>
+					</td>
+				</tr>
 			<?php endforeach; ?>
-		</ul>
-		<form method="post" action="<?php echo $post_url; // phpcs:ignore ?>" style="margin:0 0 6px;">
+			</tbody>
+		</table>
+		<form method="post" action="<?php echo $post_url; // phpcs:ignore ?>" style="margin:12px 0 6px;">
 			<input type="hidden" name="action" value="csm_rebaseline" />
 			<?php wp_nonce_field( 'csm_rebaseline' ); ?>
-			<?php submit_button( __( 'Update trusted list to match my latest scan', 'checkout-script-monitor' ), 'secondary', 'submit', false ); ?>
+			<?php submit_button( __( 'Add anything new from my latest scan', 'checkout-script-monitor' ), 'secondary', 'submit', false ); ?>
 		</form>
-		<p class="description" style="max-width:750px;"><?php esc_html_e( 'Use this after you add or remove a script on purpose (for example, a new chat widget). It replaces your trusted list with whatever your most recent scan found.', 'checkout-script-monitor' ); ?></p>
+		<p class="description" style="max-width:750px;"><?php esc_html_e( 'This adds any new domains found in your most recent scan and keeps everything you already trust. It never removes a domain on its own, so a script that is temporarily unavailable will not be dropped. To remove a domain, use Remove next to it.', 'checkout-script-monitor' ); ?></p>
 		<?php
 	}
 

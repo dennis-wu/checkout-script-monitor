@@ -4,7 +4,7 @@ Tags: pci, security, content security policy, subresource integrity, checkout
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ The scan reads scripts written into the page HTML. Scripts injected later by oth
 To your own WordPress site's database. Nothing is sent to a third party. A future opt-in version may offer a hosted collector, disclosed separately.
 
 == Changelog ==
+
+= 0.2.1 =
+* The trusted list is now sticky. "Add anything new from my latest scan" merges new domains and never removes ones you already trust, so a script that is temporarily unavailable (or a manually-trusted domain) can no longer be dropped by a re-scan. Added a per-domain Remove button for deliberate pruning, and clarified that the list holds domains.
 
 = 0.2.0 =
 * Plain-language redesign for non-technical store owners. A 3-step guided setup (scan your checkout, mark scripts as trusted, turn on monitoring). Renamed screens: "Checkout Scripts" and "Alerts" (was Violations). The "Trust this" button on an alert adds a script to your trusted list and clears it. PCI/CSP wording moved into optional "why this matters" and "technical details" sections. No change to how monitoring works.

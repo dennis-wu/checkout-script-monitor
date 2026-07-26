@@ -64,14 +64,28 @@ class CSM_CSP {
 	}
 
 	/**
-	 * Adopt the latest scan's hosts as the confirmed CSP baseline.
+	 * Merge the latest scan's hosts INTO the confirmed baseline.
+	 *
+	 * Additive by design: it adds newly-seen hosts and never drops existing ones.
+	 * A trusted host must not be silently removed just because a scan missed it
+	 * (a temporarily-unavailable script, a partial scan, or a manually-trusted
+	 * host that is not a page script). Removal is always an explicit merchant
+	 * action via remove_baseline_host().
 	 *
 	 * @return array
 	 */
 	public function rebaseline() {
+		$existing = $this->get_baseline();
+		$hosts    = ( isset( $existing['hosts'] ) && is_array( $existing['hosts'] ) ) ? $existing['hosts'] : array();
+		foreach ( (array) $this->inventory->snapshot_hosts() as $h ) {
+			$h = $this->clean_host( $h );
+			if ( '' !== $h && ! in_array( $h, $hosts, true ) ) {
+				$hosts[] = $h;
+			}
+		}
 		$baseline = array(
-			'hosts'      => array_values( array_unique( $this->inventory->snapshot_hosts() ) ),
-			'created_at' => current_time( 'mysql' ),
+			'hosts'      => array_values( array_unique( $hosts ) ),
+			'created_at' => ! empty( $existing['created_at'] ) ? $existing['created_at'] : current_time( 'mysql' ),
 		);
 		update_option( CSM_OPT_BASELINE, $baseline, false );
 		return $baseline;
@@ -285,6 +299,31 @@ class CSM_CSP {
 		$baseline['created_at'] = ! empty( $baseline['created_at'] ) ? $baseline['created_at'] : current_time( 'mysql' );
 		update_option( CSM_OPT_BASELINE, $baseline, false );
 		return true;
+	}
+
+	/**
+	 * Remove one host from the confirmed baseline ("untrust"). Explicit only.
+	 *
+	 * @param string $host Host or full URL to remove.
+	 */
+	public function remove_baseline_host( $host ) {
+		$host = $this->clean_host( $host );
+		if ( '' === $host ) {
+			return;
+		}
+		$baseline = $this->get_baseline();
+		if ( empty( $baseline['hosts'] ) || ! is_array( $baseline['hosts'] ) ) {
+			return;
+		}
+		$baseline['hosts'] = array_values(
+			array_filter(
+				$baseline['hosts'],
+				static function ( $h ) use ( $host ) {
+					return $h !== $host;
+				}
+			)
+		);
+		update_option( CSM_OPT_BASELINE, $baseline, false );
 	}
 
 	/**
