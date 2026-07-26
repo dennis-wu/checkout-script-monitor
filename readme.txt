@@ -4,7 +4,7 @@ Tags: pci, security, content security policy, subresource integrity, checkout
 Requires at least: 6.2
 Tested up to: 6.6
 Requires PHP: 7.4
-Stable tag: 0.1.3
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -53,6 +53,9 @@ The scan reads scripts written into the page HTML. Scripts injected later by oth
 To your own WordPress site's database. Nothing is sent to a third party. A future opt-in version may offer a hosted collector, disclosed separately.
 
 == Changelog ==
+
+= 0.2.0 =
+* Plain-language redesign for non-technical store owners. A 3-step guided setup (scan your checkout, mark scripts as trusted, turn on monitoring). Renamed screens: "Checkout Scripts" and "Alerts" (was Violations). The "Trust this" button on an alert adds a script to your trusted list and clears it. PCI/CSP wording moved into optional "why this matters" and "technical details" sections. No change to how monitoring works.
 
 = 0.1.3 =
 * Renamed the plugin to Checkout Script Monitor (display name). The tool monitors and inventories the scripts on your checkout (Report-Only, never blocks) rather than guarding or blocking them, and the name now reflects that. No functional change.

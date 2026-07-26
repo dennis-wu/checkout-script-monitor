@@ -250,6 +250,59 @@ class CSM_CSP {
 		$wpdb->query( "TRUNCATE TABLE `{$table}`" ); // phpcs:ignore
 	}
 
+	/**
+	 * Normalize a host or URL down to a bare hostname (a-z0-9.-).
+	 *
+	 * @param string $host Host or full URL.
+	 * @return string
+	 */
+	public function clean_host( $host ) {
+		$host = (string) $host;
+		if ( false !== strpos( $host, '://' ) || '//' === substr( $host, 0, 2 ) ) {
+			$parsed = wp_parse_url( ( '//' === substr( $host, 0, 2 ) ) ? 'https:' . $host : $host );
+			$host   = isset( $parsed['host'] ) ? $parsed['host'] : '';
+		}
+		return (string) preg_replace( '/[^a-z0-9.\-]/i', '', $host );
+	}
+
+	/**
+	 * Add one host to the confirmed baseline ("trust this script").
+	 *
+	 * @param string $host Host or full URL to trust.
+	 * @return bool True if a host was added.
+	 */
+	public function add_baseline_host( $host ) {
+		$host = $this->clean_host( $host );
+		if ( '' === $host ) {
+			return false;
+		}
+		$baseline = $this->get_baseline();
+		$hosts    = ( isset( $baseline['hosts'] ) && is_array( $baseline['hosts'] ) ) ? $baseline['hosts'] : array();
+		if ( ! in_array( $host, $hosts, true ) ) {
+			$hosts[] = $host;
+		}
+		$baseline['hosts']      = array_values( array_unique( $hosts ) );
+		$baseline['created_at'] = ! empty( $baseline['created_at'] ) ? $baseline['created_at'] : current_time( 'mysql' );
+		update_option( CSM_OPT_BASELINE, $baseline, false );
+		return true;
+	}
+
+	/**
+	 * Delete stored alerts for a host (used after trusting it, to resolve them).
+	 *
+	 * @param string $host Host or full URL.
+	 */
+	public function forget_host( $host ) {
+		global $wpdb;
+		$host = $this->clean_host( $host );
+		if ( '' === $host ) {
+			return;
+		}
+		$table = self::table();
+		$like  = '%' . $wpdb->esc_like( $host ) . '%';
+		$wpdb->query( $wpdb->prepare( "DELETE FROM `{$table}` WHERE blocked_uri LIKE %s", $like ) ); // phpcs:ignore
+	}
+
 	public static function table() {
 		global $wpdb;
 		return $wpdb->prefix . 'csm_violations';
