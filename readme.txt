@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.2
+Stable tag: 0.3.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -72,7 +72,14 @@ To your own WordPress site's database. Nothing is sent to a third party. A futur
 3. Alerts: a new or changed script on your checkout that is not on your trusted list, with a one-click "Trust this".
 4. Your trusted script sources and the monitoring toggle.
 
+== About the author ==
+
+Checkout Script Monitor is built by CyberShield Studio, a founder-led PCI compliance practice for e-commerce merchants. Its maker, Dennis Wu, holds the CISSP and PCIP certifications and has 30+ years in security. The plugin is open source (GPLv2), so you can read every line yourself.
+
 == Changelog ==
+
+= 0.3.3 =
+* Author credentials (CISSP, PCIP) surfaced in the plugin metadata and a new "About the author" section. Corrected a leftover "ScriptGuard" identifier in the self-scan user-agent to "CheckoutScriptMonitor". No functional change.
 
 = 0.3.2 =
 * The trusted list now stores the exact host each script loads from, including any "www." prefix, so a trusted domain matches what you see in the script list (e.g. www.googletagmanager.com, not googletagmanager.com). First-party detection still treats www and non-www as the same site. Root-cause follow-up to 0.3.1.

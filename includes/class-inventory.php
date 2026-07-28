@@ -80,7 +80,7 @@ class CSM_Inventory {
 				$url,
 				array(
 					'timeout'    => 15,
-					'user-agent' => 'ScriptGuard/' . CSM_VERSION . ' (+https://cybershieldstudio.com)',
+					'user-agent' => 'CheckoutScriptMonitor/' . CSM_VERSION . ' (+https://cybershieldstudio.com)',
 				)
 			);
 
