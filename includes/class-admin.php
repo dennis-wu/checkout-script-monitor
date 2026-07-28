@@ -41,6 +41,7 @@ class CSM_Admin {
 		add_action( 'admin_post_csm_clear_violations', array( $this, 'handle_clear_violations' ) );
 		add_action( 'admin_post_csm_dismiss_notice', array( $this, 'handle_dismiss_notice' ) );
 		add_action( 'admin_notices', array( $this, 'funnel_notice' ) );
+		add_filter( 'admin_footer_text', array( $this, 'admin_footer_rating' ) );
 	}
 
 	public function menu() {
@@ -66,6 +67,40 @@ class CSM_Admin {
 		}
 		add_submenu_page( 'checkout-script-monitor', __( 'Alerts', 'checkout-script-monitor' ), $alerts_label, $cap, 'checkout-script-monitor-alerts', array( $this, 'render_alerts' ) );
 		add_submenu_page( 'checkout-script-monitor', __( 'Settings', 'checkout-script-monitor' ), __( 'Settings', 'checkout-script-monitor' ), $cap, 'checkout-script-monitor-settings', array( $this, 'render_settings' ) );
+	}
+
+	/**
+	 * On our own admin screens, swap the WordPress footer credit for a friendly
+	 * five-star review nudge that links to the plugin's wordpress.org reviews page.
+	 * Every other admin screen is left untouched.
+	 *
+	 * @param string $text Default admin footer text.
+	 * @return string
+	 */
+	public function admin_footer_rating( $text ) {
+		$screen = get_current_screen();
+		if ( ! $screen || false === strpos( $screen->id, 'checkout-script-monitor' ) ) {
+			return $text;
+		}
+
+		$stars = str_repeat(
+			'<span class="dashicons dashicons-star-filled" style="color:#f59e0b;font-size:16px;width:16px;height:16px;line-height:1;vertical-align:text-bottom;"></span>',
+			5
+		);
+
+		$link = sprintf(
+			'<a href="%1$s" target="_blank" rel="noopener noreferrer" aria-label="%2$s" style="text-decoration:underline;color:#f59e0b;">%3$s</a>',
+			esc_url( 'https://wordpress.org/support/plugin/checkout-script-monitor/reviews/?filter=5' ),
+			esc_attr__( 'Rate Checkout Script Monitor five stars on WordPress.org', 'checkout-script-monitor' ),
+			$stars
+		);
+
+		return sprintf(
+			/* translators: 1: plugin name (bold), 2: five star icons that link to the plugin's WordPress.org review page. */
+			__( 'Enjoying %1$s? A quick %2$s review helps other stores find it. Thank you!', 'checkout-script-monitor' ),
+			'<strong>' . esc_html__( 'Checkout Script Monitor', 'checkout-script-monitor' ) . '</strong>',
+			$link
+		);
 	}
 
 	private function guard() {
@@ -183,10 +218,9 @@ class CSM_Admin {
 		echo '<div class="notice notice-info"><p>';
 		echo wp_kses_post(
 			sprintf(
-				/* translators: 1: Webpage Security Checker link, 2: SAQ A Readiness AI Advisor link. */
-				__( 'Want an outside view of your checkout? Run a free scan with the %1$s, or see where you stand with the %2$s.', 'checkout-script-monitor' ),
-				'<a href="https://cybershieldstudio.com/tools/page-checker" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Webpage Security Checker', 'checkout-script-monitor' ) . '</a>',
-				'<a href="https://cybershieldstudio.com/tools/saq-a-ready" target="_blank" rel="noopener noreferrer">' . esc_html__( 'SAQ A Readiness AI Advisor', 'checkout-script-monitor' ) . '</a>'
+				/* translators: %s: Webpage Security Checker link. */
+				__( 'Want an outside view of your checkout? Run a free scan with the %s.', 'checkout-script-monitor' ),
+				'<a href="https://cybershieldstudio.com/tools/page-checker" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Webpage Security Checker', 'checkout-script-monitor' ) . '</a>'
 			)
 		);
 		echo ' <a href="' . esc_url( $dismiss ) . '">' . esc_html__( 'Dismiss', 'checkout-script-monitor' ) . '</a>';
@@ -221,8 +255,8 @@ class CSM_Admin {
 				<?php $this->render_setup_card( $snap, $has_scan, $has_trusted, $monitoring, $post_url ); ?>
 			<?php endif; ?>
 
-			<?php if ( $has_scan ) { $this->render_scripts_table( $snap, $post_url ); } ?>
 			<?php if ( $has_trusted ) { $this->render_trusted_list( $baseline, $post_url ); } ?>
+			<?php if ( $has_scan ) { $this->render_scripts_table( $snap, $post_url, $baseline ); } ?>
 			<?php $this->render_why(); ?>
 		</div>
 		<?php
@@ -278,7 +312,34 @@ class CSM_Admin {
 		<?php
 	}
 
-	private function render_scripts_table( $snap, $post_url ) {
+	private function render_scripts_table( $snap, $post_url, $baseline ) {
+		$trusted_hosts = ( ! empty( $baseline['hosts'] ) && is_array( $baseline['hosts'] ) ) ? $baseline['hosts'] : array();
+		$has_baseline  = ! empty( $trusted_hosts );
+
+		// Sort by "Loaded by" so scripts from the same source (WooCommerce, Stripe,
+		// WordPress core) group together instead of scattering. Read-only display sort.
+		$order   = ( isset( $_GET['csm_order'] ) && 'desc' === sanitize_key( wp_unslash( $_GET['csm_order'] ) ) ) ? 'desc' : 'asc'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$scripts = ( isset( $snap['scripts'] ) && is_array( $snap['scripts'] ) ) ? $snap['scripts'] : array();
+		usort(
+			$scripts,
+			function ( $a, $b ) use ( $order ) {
+				$cmp = strcasecmp( $this->loaded_by( $a ), $this->loaded_by( $b ) );
+				if ( 0 === $cmp ) {
+					$cmp = strcasecmp( (string) $a['src'], (string) $b['src'] );
+				}
+				return ( 'desc' === $order ) ? -$cmp : $cmp;
+			}
+		);
+		$sort_url = esc_url(
+			add_query_arg(
+				array(
+					'page'      => 'checkout-script-monitor',
+					'csm_order' => ( 'asc' === $order ) ? 'desc' : 'asc',
+				),
+				admin_url( 'admin.php' )
+			)
+		);
+		$arrow = ( 'asc' === $order ) ? '&#9650;' : '&#9660;';
 		?>
 		<h2><?php esc_html_e( 'What is running on your checkout now', 'checkout-script-monitor' ); ?></h2>
 		<p>
@@ -306,19 +367,35 @@ class CSM_Admin {
 			</p></div>
 		<?php endif; ?>
 
-		<?php if ( empty( $snap['scripts'] ) ) : ?>
+		<?php if ( empty( $scripts ) ) : ?>
 			<p><em><?php esc_html_e( 'No outside scripts found on your checkout. That is a simple, low-risk setup.', 'checkout-script-monitor' ); ?></em></p>
 		<?php else : ?>
-			<table class="widefat striped" style="max-width:900px;">
+			<table class="widefat<?php echo $has_baseline ? '' : ' striped'; ?>" style="max-width:960px;">
 				<thead><tr>
 					<th><?php esc_html_e( 'Script', 'checkout-script-monitor' ); ?></th>
-					<th><?php esc_html_e( 'Loaded by', 'checkout-script-monitor' ); ?></th>
+					<th><?php esc_html_e( 'Source', 'checkout-script-monitor' ); ?></th>
+					<th>
+						<a href="<?php echo $sort_url; // phpcs:ignore ?>" style="text-decoration:none;" title="<?php esc_attr_e( 'Sort by who loaded each script', 'checkout-script-monitor' ); ?>"><?php esc_html_e( 'Loaded by', 'checkout-script-monitor' ); ?> <span aria-hidden="true"><?php echo $arrow; // phpcs:ignore ?></span></a>
+					</th>
 					<th><?php esc_html_e( 'Tamper check', 'checkout-script-monitor' ); ?></th>
 				</tr></thead>
 				<tbody>
-				<?php foreach ( $snap['scripts'] as $s ) : ?>
-					<tr>
+				<?php
+				foreach ( $scripts as $s ) :
+					$host      = isset( $s['host'] ) ? (string) $s['host'] : '';
+					$trusted   = $has_baseline && '' !== $host && in_array( $host, $trusted_hosts, true );
+					$row_style = $has_baseline ? ' style="background-color:' . ( $trusted ? '#eef7ed' : '#f6f7f7' ) . ';"' : '';
+					?>
+					<tr<?php echo $row_style; // phpcs:ignore ?>>
 						<td><code style="font-size:12px;"><?php echo esc_html( $s['src'] ); ?></code></td>
+						<td>
+							<code style="font-size:12px;"><?php echo '' !== $host ? esc_html( $host ) : '&mdash;'; ?></code>
+							<?php if ( $has_baseline && $trusted ) : ?>
+								<br /><span style="color:#008a20;font-size:11px;"><?php esc_html_e( 'trusted', 'checkout-script-monitor' ); ?></span>
+							<?php elseif ( $has_baseline ) : ?>
+								<br /><span style="color:#8a6d00;font-size:11px;"><?php esc_html_e( 'not in your list', 'checkout-script-monitor' ); ?></span>
+							<?php endif; ?>
+						</td>
 						<td>
 								<?php echo esc_html( $this->loaded_by( $s ) ); ?>
 								<?php if ( ! empty( $s['third_party'] ) ) : ?>
@@ -336,7 +413,10 @@ class CSM_Admin {
 				<?php endforeach; ?>
 				</tbody>
 			</table>
-			<p class="description" style="max-width:750px;"><?php esc_html_e( '"Loaded by" names the source of each script: a WordPress component or one of your own plugins/themes for first-party scripts, or the outside company for anything marked external. "Tamper check" is an optional extra lock some providers offer; a missing one is common and not itself a problem.', 'checkout-script-monitor' ); ?></p>
+			<p class="description" style="max-width:750px;">
+				<?php esc_html_e( '"Source" is the domain each script loads from, the same value you trust in the list above. "Loaded by" names who added it (a WordPress component or plugin for your own scripts, or the outside company for external ones); click it to group by source. "Tamper check" is an optional extra lock some providers offer; a missing one is common and not itself a problem.', 'checkout-script-monitor' ); ?>
+				<?php if ( $has_baseline ) { esc_html_e( 'Green rows come from a domain you trust; grey rows are from a source not in your trusted list yet.', 'checkout-script-monitor' ); } ?>
+			</p>
 		<?php endif; ?>
 		<?php
 	}
@@ -416,7 +496,7 @@ class CSM_Admin {
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Alerts', 'checkout-script-monitor' ); ?></h1>
 			<?php $this->notice_text(); ?>
-			<p style="max-width:750px;font-size:14px;"><?php esc_html_e( 'These are scripts that have appeared on your checkout but are not on your trusted list. Often it is just an update from a tool you already use, but it can also mean something was added without your knowledge. For each one: trust it if you recognize it, or get it removed from your store if you do not.', 'checkout-script-monitor' ); ?></p>
+			<p style="max-width:750px;font-size:14px;"><?php esc_html_e( 'These are scripts that have appeared on your checkout but are not on your trusted list. Often it is just an update from a tool you already use, but it can also mean something was added without your knowledge. For each one: trust it if you recognize it, or consider removing it from your store if you do not.', 'checkout-script-monitor' ); ?></p>
 
 			<?php if ( ! $enabled ) : ?>
 				<div class="notice notice-warning inline" style="max-width:750px;"><p><?php
@@ -455,7 +535,7 @@ class CSM_Admin {
 									<input type="hidden" name="action" value="csm_trust" />
 									<input type="hidden" name="uri" value="<?php echo esc_attr( $r->blocked_uri ); ?>" />
 									<?php wp_nonce_field( 'csm_trust' ); ?>
-									<?php submit_button( __( 'Trust this', 'checkout-script-monitor' ), 'secondary small', 'submit', false ); ?>
+									<?php submit_button( __( 'Trust it', 'checkout-script-monitor' ), 'secondary small', 'submit', false ); ?>
 								</form>
 								<details style="display:inline-block;margin-left:8px;vertical-align:middle;">
 									<summary style="cursor:pointer;color:#2271b1;font-weight:400;"><?php esc_html_e( 'I do not recognize this', 'checkout-script-monitor' ); ?></summary>
