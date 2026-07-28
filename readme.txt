@@ -80,6 +80,8 @@ Checkout Script Monitor is built by CyberShield Studio, a founder-led PCI compli
 
 = 0.3.3 =
 * Author credentials (CISSP, PCIP) surfaced in the plugin metadata and a new "About the author" section. Corrected a leftover "ScriptGuard" identifier in the self-scan user-agent to "CheckoutScriptMonitor". No functional change.
+* Checkout Scripts screen: added a "Source" column showing the domain each script loads from (the same value your trusted list uses), made "Loaded by" a click-to-sort heading so scripts from the same source group together, and shaded each row by trust (green for a domain you trust, grey for one not on your list yet) once a baseline is set. The trusted-sources list now sits above the full script table.
+* Alerts: softened the guidance to "consider removing it from your store," renamed the per-alert button to "Trust it," and removed the SAQ A Readiness advisor link from the in-plugin tip. Added a small "leave a review" prompt in the footer of the plugin's own admin screens.
 
 = 0.3.2 =
 * The trusted list now stores the exact host each script loads from, including any "www." prefix, so a trusted domain matches what you see in the script list (e.g. www.googletagmanager.com, not googletagmanager.com). First-party detection still treats www and non-www as the same site. Root-cause follow-up to 0.3.1.
