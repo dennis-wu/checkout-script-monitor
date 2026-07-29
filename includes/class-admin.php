@@ -71,8 +71,7 @@ class CSM_Admin {
 
 	/**
 	 * On our own admin screens, swap the WordPress footer credit for a friendly
-	 * five-star review nudge that links to the plugin's wordpress.org reviews page.
-	 * Every other admin screen is left untouched.
+	 * thank-you note. Every other admin screen is left untouched.
 	 *
 	 * @param string $text Default admin footer text.
 	 * @return string
@@ -83,23 +82,10 @@ class CSM_Admin {
 			return $text;
 		}
 
-		$stars = str_repeat(
-			'<span class="dashicons dashicons-star-filled" style="color:#f59e0b;font-size:16px;width:16px;height:16px;line-height:1;vertical-align:text-bottom;"></span>',
-			5
-		);
-
-		$link = sprintf(
-			'<a href="%1$s" target="_blank" rel="noopener noreferrer" aria-label="%2$s" style="text-decoration:underline;color:#f59e0b;">%3$s</a>',
-			esc_url( 'https://wordpress.org/support/plugin/checkout-script-monitor/reviews/?filter=5' ),
-			esc_attr__( 'Rate Checkout Script Monitor five stars on WordPress.org', 'checkout-script-monitor' ),
-			$stars
-		);
-
 		return sprintf(
-			/* translators: 1: plugin name (bold), 2: five star icons that link to the plugin's WordPress.org review page. */
-			__( 'Enjoying %1$s? A quick %2$s review helps other stores find it. Thank you!', 'checkout-script-monitor' ),
-			'<strong>' . esc_html__( 'Checkout Script Monitor', 'checkout-script-monitor' ) . '</strong>',
-			$link
+			/* translators: 1: plugin name (bold). */
+			__( 'Enjoying %1$s? Thank you for using!', 'checkout-script-monitor' ),
+			'<strong>' . esc_html__( 'Checkout Script Monitor', 'checkout-script-monitor' ) . '</strong>'
 		);
 	}
 
@@ -384,14 +370,14 @@ class CSM_Admin {
 				foreach ( $scripts as $s ) :
 					$host      = isset( $s['host'] ) ? (string) $s['host'] : '';
 					$trusted   = $has_baseline && '' !== $host && in_array( $host, $trusted_hosts, true );
-					$row_style = $has_baseline ? ' style="background-color:' . ( $trusted ? '#eef7ed' : '#f6f7f7' ) . ';"' : '';
+					$row_style = $has_baseline ? ' style="background-color:#f6f7f7;"' : '';
 					?>
 					<tr<?php echo $row_style; // phpcs:ignore ?>>
 						<td><code style="font-size:12px;"><?php echo esc_html( $s['src'] ); ?></code></td>
 						<td>
 							<code style="font-size:12px;"><?php echo '' !== $host ? esc_html( $host ) : '&mdash;'; ?></code>
 							<?php if ( $has_baseline && $trusted ) : ?>
-								<br /><span style="color:#008a20;font-size:11px;"><?php esc_html_e( 'trusted', 'checkout-script-monitor' ); ?></span>
+								<br /><span style="color:#50575e;font-size:11px;"><?php esc_html_e( 'trusted', 'checkout-script-monitor' ); ?></span>
 							<?php elseif ( $has_baseline ) : ?>
 								<br /><span style="color:#8a6d00;font-size:11px;"><?php esc_html_e( 'not in your list', 'checkout-script-monitor' ); ?></span>
 							<?php endif; ?>
@@ -404,7 +390,7 @@ class CSM_Admin {
 							</td>
 						<td><?php
 							if ( ! empty( $s['has_sri'] ) ) {
-								echo '<span style="color:#008a20;">' . esc_html__( 'Locked', 'checkout-script-monitor' ) . '</span>';
+								echo '<span style="color:#50575e;">' . esc_html__( 'Locked', 'checkout-script-monitor' ) . '</span>';
 							} else {
 								echo '<span style="color:#787c82;" title="' . esc_attr__( 'A tamper check (called SRI) lets the browser reject this script if it has been altered. It is optional and only some providers offer it.', 'checkout-script-monitor' ) . '">' . esc_html__( 'Not set', 'checkout-script-monitor' ) . '</span>';
 							}
@@ -415,7 +401,7 @@ class CSM_Admin {
 			</table>
 			<p class="description" style="max-width:750px;">
 				<?php esc_html_e( '"Source" is the domain each script loads from, the same value you trust in the list above. "Loaded by" names who added it (a WordPress component or plugin for your own scripts, or the outside company for external ones); click it to group by source. "Tamper check" is an optional extra lock some providers offer; a missing one is common and not itself a problem.', 'checkout-script-monitor' ); ?>
-				<?php if ( $has_baseline ) { esc_html_e( 'Green rows come from a domain you trust; grey rows are from a source not in your trusted list yet.', 'checkout-script-monitor' ); } ?>
+				<?php if ( $has_baseline ) { esc_html_e( 'Rows marked "trusted" come from a domain in your trusted list; rows marked "not in your list" are from a source not yet approved.', 'checkout-script-monitor' ); } ?>
 			</p>
 		<?php endif; ?>
 		<?php
