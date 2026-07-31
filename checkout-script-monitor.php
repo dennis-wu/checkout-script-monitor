@@ -11,7 +11,6 @@
  * License:           GPLv2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain:       checkout-script-monitor
- * Domain Path:       /languages
  *
  * Checkout Script Monitor for WooCommerce is free software: you can redistribute it and/or
  * modify it under the terms of the GNU General Public License, version 2, as
@@ -46,8 +45,6 @@ require_once CSM_DIR . 'includes/class-admin.php';
  * Boot the plugin.
  */
 function csm_init() {
-	load_plugin_textdomain( 'checkout-script-monitor', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
-
 	$inventory = new CSM_Inventory();
 	$csp       = new CSM_CSP( $inventory );
 	$csp->hooks();
