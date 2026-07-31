@@ -21,7 +21,7 @@ rm -f "$OUT"
 # slug. Exclude VCS, dev tooling, and the build output itself.
 ( cd .. && zip -r -q "$OUT" "$SLUG" \
     -x "$SLUG/.git/*" "$SLUG/.github/*" "$SLUG/node_modules/*" "$SLUG/vendor/*" \
-       "$SLUG/bin/*" "$SLUG/tests/*" "$SLUG/dist/*" \
+       "$SLUG/bin/*" "$SLUG/tests/*" "$SLUG/dist/*" "$SLUG/.wordpress-org/*" \
        "$SLUG/.wp-env.json" "$SLUG/.wp-env.override.json" \
        "$SLUG/.gitignore" "$SLUG/.distignore" "$SLUG/.DS_Store" "$SLUG/*.zip" )
 
