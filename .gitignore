@@ -15,3 +15,4 @@ Thumbs.db
 
 # wp-env — commit .wp-env.json, ignore personal local overrides
 .wp-env.override.json
+.gstack/
