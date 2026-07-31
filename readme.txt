@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.4
+Stable tag: 0.3.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,9 @@ To your own WordPress site's database. Nothing is sent to a third party. A futur
 Checkout Script Monitor is built by CyberShield Studio, a founder-led PCI compliance practice for e-commerce merchants. Its maker, Dennis Wu, holds the CISSP and PCIP certifications and has 30+ years in security. The plugin is open source (GPLv2), so you can read every line yourself.
 
 == Changelog ==
+
+= 0.3.5 =
+* Admin UI polish. Styling now lives in a dedicated stylesheet loaded only on the plugin's own screens (no more inline styles scattered through the tables). The script count on Checkout Scripts is a compact stat strip; trust, external, and tamper-check states show as clear badges; any source not on your trusted list is highlighted in the table, and Alerts rows carry the same attention accent; Settings shows the current monitoring state at a glance. No functional change.
 
 = 0.3.4 =
 * Checkout Scripts: added an at-a-glance summary line above the script table — how many scripts run on your checkout, how many are from outside companies, and how many have no tamper (SRI) check — so the PCI 6.4.3 picture is visible without reading the whole table. Minor footer and settings-label polish.

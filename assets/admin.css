@@ -1,0 +1,73 @@
+/**
+ * Checkout Script Monitor — admin UI styles.
+ * Enqueued only on the plugin's own screens. Uses the WordPress admin palette so
+ * it reads as native wp-admin, and the admin theme accent (--wp-admin-theme-color)
+ * where an accent helps.
+ */
+
+/* ── Stat strip (the at-a-glance count above the script table) ─────────────── */
+.csm-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 8px 0 16px;
+}
+.csm-stat {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	padding: 10px 16px;
+	min-width: 104px;
+}
+.csm-stat__num {
+	display: block;
+	font-size: 22px;
+	font-weight: 700;
+	line-height: 1.1;
+	color: #1d2327;
+}
+.csm-stat__label {
+	display: block;
+	font-size: 12px;
+	color: #646970;
+	margin-top: 3px;
+}
+.csm-stat--accent .csm-stat__num { color: var(--wp-admin-theme-color, #2271b1); }
+.csm-stat--warn .csm-stat__num { color: #8a6d00; }
+
+/* ── Badges (trust, external, SRI) ─────────────────────────────────────────── */
+.csm-badge {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 9px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.7;
+	border: 1px solid transparent;
+	white-space: nowrap;
+}
+.csm-badge .dashicons {
+	font-size: 12px;
+	width: 12px;
+	height: 12px;
+	line-height: 1.5;
+	vertical-align: text-top;
+}
+.csm-badge--trusted   { color: #0a6b1c; background: #edf7ed; border-color: #b7e0bd; }
+.csm-badge--untrusted { color: #8a6d00; background: #fcf6e6; border-color: #f0dfa8; }
+.csm-badge--external  { color: #50575e; background: #f0f0f1; border-color: #dcdcde; }
+.csm-badge--sri-on    { color: #0a6b1c; background: #edf7ed; border-color: #b7e0bd; }
+.csm-badge--sri-off   { color: #646970; background: #f0f0f1; border-color: #dcdcde; }
+
+/* ── Scripts table ─────────────────────────────────────────────────────────── */
+.csm-scripts td { vertical-align: middle; }
+.csm-scripts .csm-host,
+.csm-scripts .csm-script { font-size: 12px; }
+.csm-scripts .csm-script { word-break: break-all; }
+.csm-scripts .csm-source-badge { display: inline-block; margin-top: 4px; }
+
+/* Trust accent: a subtle left bar (and a soft amber wash on the rows that need a
+   look), instead of the flat grey applied uniformly to every row. */
+.csm-row--trusted   > td:first-child { box-shadow: inset 3px 0 0 #56b85f; }
+.csm-row--untrusted > td:first-child { box-shadow: inset 3px 0 0 #dba617; }
+.csm-row--untrusted > td { background: #fffaf0; }

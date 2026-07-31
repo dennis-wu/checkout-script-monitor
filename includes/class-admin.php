@@ -42,6 +42,19 @@ class CSM_Admin {
 		add_action( 'admin_post_csm_dismiss_notice', array( $this, 'handle_dismiss_notice' ) );
 		add_action( 'admin_notices', array( $this, 'funnel_notice' ) );
 		add_filter( 'admin_footer_text', array( $this, 'admin_footer_rating' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+	}
+
+	/**
+	 * Load the plugin's admin stylesheet on its own screens only.
+	 *
+	 * @param string $hook Current admin page hook.
+	 */
+	public function enqueue_assets( $hook ) {
+		if ( false === strpos( (string) $hook, 'checkout-script-monitor' ) ) {
+			return;
+		}
+		wp_enqueue_style( 'csm-admin', CSM_URL . 'assets/admin.css', array(), CSM_VERSION );
 	}
 
 	public function menu() {
@@ -361,18 +374,21 @@ class CSM_Admin {
 			$ext    = (int) ( isset( $snap['third_party'] ) ? $snap['third_party'] : 0 );
 			$no_sri = (int) ( isset( $snap['missing_sri'] ) ? $snap['missing_sri'] : 0 );
 			?>
-			<p style="font-size:14px;margin:2px 0 12px;">
-				<?php
-				printf(
-					/* translators: 1: total number of scripts (bold), 2: number loaded from outside companies, 3: number with no SRI tamper check. */
-					wp_kses_post( __( '<strong>%1$s</strong> on your checkout &middot; %2$s from outside companies &middot; %3$s without a tamper check.', 'checkout-script-monitor' ) ),
-					esc_html( sprintf( _n( '%s script', '%s scripts', $total, 'checkout-script-monitor' ), number_format_i18n( $total ) ) ),
-					esc_html( number_format_i18n( $ext ) ),
-					esc_html( number_format_i18n( $no_sri ) )
-				);
-				?>
-			</p>
-			<table class="widefat<?php echo $has_baseline ? '' : ' striped'; ?>" style="max-width:960px;">
+			<div class="csm-stats">
+				<div class="csm-stat">
+					<span class="csm-stat__num"><?php echo esc_html( number_format_i18n( $total ) ); ?></span>
+					<span class="csm-stat__label"><?php esc_html_e( 'scripts on your checkout', 'checkout-script-monitor' ); ?></span>
+				</div>
+				<div class="csm-stat">
+					<span class="csm-stat__num"><?php echo esc_html( number_format_i18n( $ext ) ); ?></span>
+					<span class="csm-stat__label"><?php esc_html_e( 'from outside companies', 'checkout-script-monitor' ); ?></span>
+				</div>
+				<div class="csm-stat<?php echo $no_sri > 0 ? ' csm-stat--warn' : ''; ?>">
+					<span class="csm-stat__num"><?php echo esc_html( number_format_i18n( $no_sri ) ); ?></span>
+					<span class="csm-stat__label"><?php esc_html_e( 'without a tamper check', 'checkout-script-monitor' ); ?></span>
+				</div>
+			</div>
+			<table class="widefat csm-scripts<?php echo $has_baseline ? '' : ' striped'; ?>" style="max-width:960px;">
 				<thead><tr>
 					<th><?php esc_html_e( 'Script', 'checkout-script-monitor' ); ?></th>
 					<th><?php esc_html_e( 'Source', 'checkout-script-monitor' ); ?></th>
@@ -386,31 +402,31 @@ class CSM_Admin {
 				foreach ( $scripts as $s ) :
 					$host      = isset( $s['host'] ) ? (string) $s['host'] : '';
 					$trusted   = $has_baseline && '' !== $host && in_array( $host, $trusted_hosts, true );
-					$row_style = $has_baseline ? ' style="background-color:#f6f7f7;"' : '';
+					$row_class = $has_baseline ? ( $trusted ? 'csm-row--trusted' : 'csm-row--untrusted' ) : '';
 					?>
-					<tr<?php echo $row_style; // phpcs:ignore ?>>
-						<td><code style="font-size:12px;"><?php echo esc_html( $s['src'] ); ?></code></td>
+					<tr class="<?php echo esc_attr( $row_class ); ?>">
+						<td><code class="csm-script"><?php echo esc_html( $s['src'] ); ?></code></td>
 						<td>
-							<code style="font-size:12px;"><?php echo '' !== $host ? esc_html( $host ) : '&mdash;'; ?></code>
+							<code class="csm-host"><?php echo '' !== $host ? esc_html( $host ) : '&mdash;'; ?></code>
 							<?php if ( $has_baseline && $trusted ) : ?>
-								<br /><span style="color:#50575e;font-size:11px;"><?php esc_html_e( 'trusted', 'checkout-script-monitor' ); ?></span>
+								<span class="csm-badge csm-badge--trusted csm-source-badge"><?php esc_html_e( 'trusted', 'checkout-script-monitor' ); ?></span>
 							<?php elseif ( $has_baseline ) : ?>
-								<br /><span style="color:#8a6d00;font-size:11px;"><?php esc_html_e( 'not in your list', 'checkout-script-monitor' ); ?></span>
+								<span class="csm-badge csm-badge--untrusted csm-source-badge"><?php esc_html_e( 'not in your list', 'checkout-script-monitor' ); ?></span>
 							<?php endif; ?>
 						</td>
 						<td>
-								<?php echo esc_html( $this->loaded_by( $s ) ); ?>
-								<?php if ( ! empty( $s['third_party'] ) ) : ?>
-									<span style="color:#996800;font-size:11px;white-space:nowrap;">&middot; <?php echo esc_html__( 'external', 'checkout-script-monitor' ); ?></span>
-								<?php endif; ?>
-							</td>
-						<td><?php
-							if ( ! empty( $s['has_sri'] ) ) {
-								echo '<span style="color:#50575e;">' . esc_html__( 'Locked', 'checkout-script-monitor' ) . '</span>';
-							} else {
-								echo '<span style="color:#787c82;" title="' . esc_attr__( 'A tamper check (called SRI) lets the browser reject this script if it has been altered. It is optional and only some providers offer it.', 'checkout-script-monitor' ) . '">' . esc_html__( 'Not set', 'checkout-script-monitor' ) . '</span>';
-							}
-						?></td>
+							<?php echo esc_html( $this->loaded_by( $s ) ); ?>
+							<?php if ( ! empty( $s['third_party'] ) ) : ?>
+								<span class="csm-badge csm-badge--external"><?php esc_html_e( 'external', 'checkout-script-monitor' ); ?></span>
+							<?php endif; ?>
+						</td>
+						<td>
+							<?php if ( ! empty( $s['has_sri'] ) ) : ?>
+								<span class="csm-badge csm-badge--sri-on"><span class="dashicons dashicons-lock"></span> <?php esc_html_e( 'Locked', 'checkout-script-monitor' ); ?></span>
+							<?php else : ?>
+								<span class="csm-badge csm-badge--sri-off" title="<?php esc_attr_e( 'A tamper check (called SRI) lets the browser reject this script if it has been altered. It is optional and only some providers offer it.', 'checkout-script-monitor' ); ?>"><?php esc_html_e( 'Not set', 'checkout-script-monitor' ); ?></span>
+							<?php endif; ?>
+						</td>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>
@@ -519,7 +535,7 @@ class CSM_Admin {
 			<?php endif; ?>
 
 			<?php if ( $rows ) : ?>
-				<table class="widefat striped" style="max-width:1000px;margin-top:12px;">
+				<table class="widefat csm-scripts" style="max-width:1000px;margin-top:12px;">
 					<thead><tr>
 						<th><?php esc_html_e( 'New script', 'checkout-script-monitor' ); ?></th>
 						<th><?php esc_html_e( 'Times seen', 'checkout-script-monitor' ); ?></th>
@@ -528,8 +544,8 @@ class CSM_Admin {
 					</tr></thead>
 					<tbody>
 					<?php foreach ( $rows as $r ) : ?>
-						<tr>
-							<td><code style="font-size:12px;"><?php echo esc_html( $r->blocked_uri ); ?></code></td>
+						<tr class="csm-row--untrusted">
+							<td><code class="csm-script"><?php echo esc_html( $r->blocked_uri ); ?></code></td>
 							<td><?php echo (int) $r->hits; ?></td>
 							<td><?php echo esc_html( $r->last_seen ); ?></td>
 							<td>
@@ -573,6 +589,15 @@ class CSM_Admin {
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Settings', 'checkout-script-monitor' ); ?></h1>
 			<?php $this->notice_text(); ?>
+
+			<p style="font-size:14px;">
+				<?php esc_html_e( 'Monitoring:', 'checkout-script-monitor' ); ?>
+				<?php if ( $enabled ) : ?>
+					<span class="csm-badge csm-badge--trusted"><?php esc_html_e( 'On', 'checkout-script-monitor' ); ?></span>
+				<?php else : ?>
+					<span class="csm-badge csm-badge--sri-off"><?php esc_html_e( 'Off', 'checkout-script-monitor' ); ?></span>
+				<?php endif; ?>
+			</p>
 
 			<form method="post" action="<?php echo $post_url; // phpcs:ignore ?>">
 				<input type="hidden" name="action" value="csm_save_settings" />
