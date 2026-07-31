@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.3
+Stable tag: 0.3.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,7 +19,7 @@ Checkout Script Monitor gives you that visibility. It scans your own store pages
 What it does:
 
 * **Script inventory for your checkout.** Scans your home, shop, cart, and checkout pages and lists every external script, named by source (the WordPress plugin, theme, or core component for your own scripts, or the outside vendor for external ones), with its integrity (SRI) status.
-* **Plain-English PCI 6.4.3 readout.** Counts your scripts, flags the ones missing an integrity check, and explains in merchant language what Requirement 6.4.3 asks and what to do.
+* **Plain-English PCI 6.4.3 readout.** An at-a-glance line counts the scripts on your checkout and how many lack an integrity (SRI) check, and a built-in explainer covers what Requirement 6.4.3 asks and what to do, in merchant language.
 * **Drift monitoring (optional, off by default).** Emits a `Content-Security-Policy-Report-Only` header on the cart and checkout, built from a baseline of the scripts already on **your own** site. It never blocks anything. When a new or changed script appears, your browser reports it, so you can catch drift, the early signal of a skimmer, a rogue plugin update, or an unexpected third party.
 
 How the baseline works, and why it is safe:
@@ -67,10 +67,10 @@ To your own WordPress site's database. Nothing is sent to a third party. A futur
 
 == Screenshots ==
 
-1. Checkout Scripts: every script on your store pages, marked first-party or third-party, with its integrity (SRI) status, plus the guided setup.
-2. The plain-English PCI DSS 6.4.3 readout: script counts, what is missing an integrity check, and what to do.
-3. Alerts: a new or changed script on your checkout that is not on your trusted list, with a one-click "Trust this".
-4. Your trusted script sources and the monitoring toggle.
+1. First-run setup: the guided 3-step onboarding on the Checkout Scripts screen — scan your checkout, mark the scripts it finds as trusted, then turn on monitoring.
+2. Checkout Scripts: an at-a-glance count of the scripts on your checkout, then every script with its source domain, who loaded it (WordPress core, a plugin or theme, or an outside vendor), and its tamper-check (SRI) status; rows are shaded by trust once you set a trusted list.
+3. Alerts: a new or changed script that is not on your trusted list, with times seen, last seen, and a one-click "Trust it".
+4. Settings: the monitoring toggle (Content-Security-Policy-Report-Only) and the technical details of how it works.
 
 == About the author ==
 
@@ -78,10 +78,13 @@ Checkout Script Monitor is built by CyberShield Studio, a founder-led PCI compli
 
 == Changelog ==
 
+= 0.3.4 =
+* Checkout Scripts: added an at-a-glance summary line above the script table — how many scripts run on your checkout, how many are from outside companies, and how many have no tamper (SRI) check — so the PCI 6.4.3 picture is visible without reading the whole table. Minor footer and settings-label polish.
+
 = 0.3.3 =
 * Author credentials (CISSP, PCIP) surfaced in the plugin metadata and a new "About the author" section. Corrected a leftover "ScriptGuard" identifier in the self-scan user-agent to "CheckoutScriptMonitor". No functional change.
 * Checkout Scripts screen: added a "Source" column showing the domain each script loads from (the same value your trusted list uses), made "Loaded by" a click-to-sort heading so scripts from the same source group together, and shaded each row by trust (green for a domain you trust, grey for one not on your list yet) once a baseline is set. The trusted-sources list now sits above the full script table.
-* Alerts: softened the guidance to "consider removing it from your store," renamed the per-alert button to "Trust it," and removed the SAQ A Readiness advisor link from the in-plugin tip. Added a small "leave a review" prompt in the footer of the plugin's own admin screens.
+* Alerts: softened the guidance to "consider removing it from your store," renamed the per-alert button to "Trust it," and removed the SAQ A Readiness advisor link from the in-plugin tip. Added a friendly thank-you note in the footer of the plugin's own admin screens.
 
 = 0.3.2 =
 * The trusted list now stores the exact host each script loads from, including any "www." prefix, so a trusted domain matches what you see in the script list (e.g. www.googletagmanager.com, not googletagmanager.com). First-party detection still treats www and non-www as the same site. Root-cause follow-up to 0.3.1.

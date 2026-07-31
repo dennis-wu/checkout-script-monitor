@@ -356,6 +356,22 @@ class CSM_Admin {
 		<?php if ( empty( $scripts ) ) : ?>
 			<p><em><?php esc_html_e( 'No outside scripts found on your checkout. That is a simple, low-risk setup.', 'checkout-script-monitor' ); ?></em></p>
 		<?php else : ?>
+			<?php
+			$total  = (int) ( isset( $snap['total'] ) ? $snap['total'] : count( $scripts ) );
+			$ext    = (int) ( isset( $snap['third_party'] ) ? $snap['third_party'] : 0 );
+			$no_sri = (int) ( isset( $snap['missing_sri'] ) ? $snap['missing_sri'] : 0 );
+			?>
+			<p style="font-size:14px;margin:2px 0 12px;">
+				<?php
+				printf(
+					/* translators: 1: total number of scripts (bold), 2: number loaded from outside companies, 3: number with no SRI tamper check. */
+					wp_kses_post( __( '<strong>%1$s</strong> on your checkout &middot; %2$s from outside companies &middot; %3$s without a tamper check.', 'checkout-script-monitor' ) ),
+					esc_html( sprintf( _n( '%s script', '%s scripts', $total, 'checkout-script-monitor' ), number_format_i18n( $total ) ) ),
+					esc_html( number_format_i18n( $ext ) ),
+					esc_html( number_format_i18n( $no_sri ) )
+				);
+				?>
+			</p>
 			<table class="widefat<?php echo $has_baseline ? '' : ' striped'; ?>" style="max-width:960px;">
 				<thead><tr>
 					<th><?php esc_html_e( 'Script', 'checkout-script-monitor' ); ?></th>

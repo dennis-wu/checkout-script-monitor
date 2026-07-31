@@ -3,7 +3,7 @@
  * Plugin Name:       Checkout Script Monitor for WooCommerce
  * Plugin URI:        https://cybershieldstudio.com/tools/page-checker
  * Description:       See every script on your checkout and where you stand on PCI DSS 6.4.3, in plain English. A readiness and visibility tool, not a compliance guarantee.
- * Version:           0.3.3
+ * Version:           0.3.4
  * Requires at least: 6.2
  * Requires PHP:      7.4
  * Author:            CyberShield Studio (Dennis Wu, CISSP, PCIP)
@@ -25,7 +25,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CSM_VERSION', '0.3.3' );
+define( 'CSM_VERSION', '0.3.4' );
 define( 'CSM_FILE', __FILE__ );
 define( 'CSM_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CSM_URL', plugin_dir_url( __FILE__ ) );
