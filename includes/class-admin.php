@@ -567,7 +567,7 @@ class CSM_Admin {
 						<td>
 							<label>
 								<input type="checkbox" name="csp_report_only" value="1" <?php checked( $enabled ); ?> />
-								<?php esc_html_e( 'Watch my checkout and alert me when a new script appears', 'checkout-script-monitor' ); ?>
+								<?php esc_html_e( 'Watch my checkout and alert me when a new script appears.', 'checkout-script-monitor' ); ?>
 							</label>
 							<p class="description" style="max-width:700px;"><?php esc_html_e( 'This never blocks, changes, or slows anything for your customers. It quietly compares what loads on your cart and checkout against your trusted list and shows anything new under Alerts. Set your trusted list first (see Checkout Scripts).', 'checkout-script-monitor' ); ?></p>
 						</td>
