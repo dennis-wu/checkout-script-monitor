@@ -228,7 +228,7 @@ class CSM_CSP {
 
 	private function store_violation( $blocked, $directive, $document, $sample ) {
 		global $wpdb;
-		$wpdb->insert(
+		$wpdb->insert( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- writing to the plugin's own custom table.
 			self::table(),
 			array(
 				'created_at'   => current_time( 'mysql' ),
@@ -238,7 +238,7 @@ class CSM_CSP {
 				'sample'       => substr( sanitize_text_field( $sample ), 0, 500 ),
 			),
 			array( '%s', '%s', '%s', '%s', '%s' )
-		); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		);
 
 		if ( 0 === wp_rand( 0, 20 ) ) {
 			$this->prune();
@@ -263,16 +263,9 @@ class CSM_CSP {
 	public function recent_violations( $limit = 100 ) {
 		global $wpdb;
 		$table = self::table();
-		return $wpdb->get_results(
-			$wpdb->prepare(
-				"SELECT blocked_uri, directive, COUNT(*) AS hits, MAX(created_at) AS last_seen
-				 FROM `{$table}`
-				 GROUP BY blocked_uri, directive
-				 ORDER BY last_seen DESC
-				 LIMIT %d",
-				$limit
-			)
-		); // phpcs:ignore
+		// Table name is a trusted $wpdb->prefix-based identifier (not user input); the value is prepared.
+		$sql = "SELECT blocked_uri, directive, COUNT(*) AS hits, MAX(created_at) AS last_seen FROM `{$table}` GROUP BY blocked_uri, directive ORDER BY last_seen DESC LIMIT %d"; // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table name is a trusted prefix-based identifier.
+		return $wpdb->get_results( $wpdb->prepare( $sql, $limit ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- reading the plugin's own custom table via a prepared %d value; the interpolated table name is a trusted prefix-based identifier; caching skipped so the admin sees fresh alerts.
 	}
 
 	public function clear_violations() {

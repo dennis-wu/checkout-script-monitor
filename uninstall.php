@@ -15,4 +15,4 @@ delete_option( 'csm_db_version' );
 
 global $wpdb;
 $table = $wpdb->prefix . 'csm_violations';
-$wpdb->query( "DROP TABLE IF EXISTS `{$table}`" ); // phpcs:ignore WordPress.DB
+$wpdb->query( "DROP TABLE IF EXISTS `{$table}`" ); // phpcs:ignore WordPress.DB, PluginCheck.Security.DirectDB.UnescapedDBParameter -- dropping the plugin's own table on uninstall; trusted prefix-based identifier.
