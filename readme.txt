@@ -18,9 +18,9 @@ Checkout Script Monitor gives you that visibility. It scans your own store pages
 
 What it does:
 
-* **Script inventory for your checkout.** Scans your home, shop, cart, and checkout pages and lists every external script, named by source (the WordPress plugin, theme, or core component for your own scripts, or the outside vendor for external ones), with its integrity (SRI) status.
+* **Script inventory across your storefront.** Scans your home, shop, cart, and checkout pages and lists every script they load from a URL, your own and third-party alike, named by source (the WordPress plugin, theme, or core component for your own scripts, or the outside vendor for external ones), with its integrity (SRI) status. The scan casts this wider net for visibility; live monitoring (below) focuses on the payment path.
 * **Plain-English PCI 6.4.3 readout.** An at-a-glance line counts the scripts on your checkout and how many lack an integrity (SRI) check, and a built-in explainer covers what Requirement 6.4.3 asks and what to do, in merchant language.
-* **Drift monitoring (optional, off by default).** Emits a `Content-Security-Policy-Report-Only` header on the cart and checkout, built from a baseline of the scripts already on **your own** site. It never blocks anything. When a new or changed script appears, your browser reports it, so you can catch drift, the early signal of a skimmer, a rogue plugin update, or an unexpected third party.
+* **Drift monitoring (optional, off by default).** Emits a `Content-Security-Policy-Report-Only` header on the cart and checkout (your payment path, the pages Requirement 6.4.3 is about), built from a baseline of the scripts already on **your own** site. It never blocks anything. When a new or changed script appears, your browser reports it, so you can catch drift, the early signal of a skimmer, a rogue plugin update, or an unexpected third party.
 
 How the baseline works, and why it is safe:
 
