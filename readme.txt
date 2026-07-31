@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.6
+Stable tag: 0.3.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -77,6 +77,9 @@ To your own WordPress site's database. Nothing is sent to a third party. A futur
 Checkout Script Monitor is built by CyberShield Studio, a founder-led PCI compliance practice for e-commerce merchants. Its maker, Dennis Wu, holds the CISSP and PCIP certifications and has 30+ years in security. The plugin is open source (GPLv2), so you can read every line yourself.
 
 == Changelog ==
+
+= 0.3.7 =
+* The in-plugin "Why this matters" note now spells out that the scan inventories your whole storefront while monitoring focuses on the cart and checkout (the payment path). Copy only; no functional change.
 
 = 0.3.6 =
 * Footer: the plugin's own admin screens now offer a one-click feedback link for bug reports and ideas, in place of the plain thank-you note. (A "leave a review" prompt will follow once the plugin is listed on WordPress.org.)

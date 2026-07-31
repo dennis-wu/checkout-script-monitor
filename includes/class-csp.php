@@ -77,6 +77,12 @@ class CSM_CSP {
 	public function rebaseline() {
 		$existing = $this->get_baseline();
 		$hosts    = ( isset( $existing['hosts'] ) && is_array( $existing['hosts'] ) ) ? $existing['hosts'] : array();
+		// TODO (v1.1): consider scoping the monitoring baseline to hosts seen on the
+		// cart/checkout (the payment path) rather than the whole storefront. Each
+		// scanned script already records the pages it appeared on, so a payment-path
+		// baseline is possible; deferred because a thin static scan of an empty
+		// cart/checkout would raise false positives until the capture is smarter
+		// (JS-rendered / authenticated cart).
 		foreach ( (array) $this->inventory->snapshot_hosts() as $h ) {
 			$h = $this->clean_host( $h );
 			if ( '' !== $h && ! in_array( $h, $hosts, true ) ) {

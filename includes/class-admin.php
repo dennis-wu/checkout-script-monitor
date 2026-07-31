@@ -506,6 +506,7 @@ class CSM_Admin {
 			<div style="padding:8px 0;color:#3c434a;">
 				<p><?php esc_html_e( 'Attackers who slip a hidden script onto a checkout page can quietly copy your customers\' card details. So knowing exactly what runs on your checkout, and noticing when it changes, is a basic security habit for any online store.', 'checkout-script-monitor' ); ?></p>
 				<p><?php esc_html_e( 'It also lines up with a PCI DSS rule (Requirement 6.4.3) that asks merchants to keep a list of the scripts on their payment pages and be able to tell when one changes. This tool helps you do that. It is a readiness and visibility aid; it does not make you PCI compliant, and that decision stays yours.', 'checkout-script-monitor' ); ?></p>
+				<p><?php esc_html_e( 'The scan lists scripts across your storefront (home, shop, cart, and checkout) so you get the full picture. Ongoing monitoring then watches your cart and checkout, the pages where customers enter card details, and alerts you to anything new there.', 'checkout-script-monitor' ); ?></p>
 				<p><em><?php esc_html_e( 'One limit worth knowing: the scan sees scripts written into the page. Scripts added later by another script (like a tag manager) may not show here, which is one more reason to turn on monitoring.', 'checkout-script-monitor' ); ?></em></p>
 			</div>
 		</details>
