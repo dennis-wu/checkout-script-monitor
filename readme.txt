@@ -4,7 +4,7 @@ Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.3.7
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,46 +78,5 @@ Checkout Script Monitor is built by CyberShield Studio, a founder-led PCI compli
 
 == Changelog ==
 
-= 0.3.7 =
-* The in-plugin "Why this matters" note now spells out that the scan inventories your whole storefront while monitoring focuses on the cart and checkout (the payment path). Copy only; no functional change.
-
-= 0.3.6 =
-* Footer: the plugin's own admin screens now offer a one-click feedback link for bug reports and ideas, in place of the plain thank-you note. (A "leave a review" prompt will follow once the plugin is listed on WordPress.org.)
-
-= 0.3.5 =
-* Admin UI polish. Styling now lives in a dedicated stylesheet loaded only on the plugin's own screens (no more inline styles scattered through the tables). The script count on Checkout Scripts is a compact stat strip; trust, external, and tamper-check states show as clear badges; any source not on your trusted list is highlighted in the table, and Alerts rows carry the same attention accent; Settings shows the current monitoring state at a glance. No functional change.
-
-= 0.3.4 =
-* Checkout Scripts: added an at-a-glance summary line above the script table — how many scripts run on your checkout, how many are from outside companies, and how many have no tamper (SRI) check — so the PCI 6.4.3 picture is visible without reading the whole table. Minor footer and settings-label polish.
-
-= 0.3.3 =
-* Author credentials (CISSP, PCIP) surfaced in the plugin metadata and a new "About the author" section. Corrected a leftover "ScriptGuard" identifier in the self-scan user-agent to "CheckoutScriptMonitor". No functional change.
-* Checkout Scripts screen: added a "Source" column showing the domain each script loads from (the same value your trusted list uses), made "Loaded by" a click-to-sort heading so scripts from the same source group together, and shaded each row by trust (green for a domain you trust, grey for one not on your list yet) once a baseline is set. The trusted-sources list now sits above the full script table.
-* Alerts: softened the guidance to "consider removing it from your store," renamed the per-alert button to "Trust it," and removed the SAQ A Readiness advisor link from the in-plugin tip. Added a friendly thank-you note in the footer of the plugin's own admin screens.
-
-= 0.3.2 =
-* The trusted list now stores the exact host each script loads from, including any "www." prefix, so a trusted domain matches what you see in the script list (e.g. www.googletagmanager.com, not googletagmanager.com). First-party detection still treats www and non-www as the same site. Root-cause follow-up to 0.3.1.
-
-= 0.3.1 =
-* Fix a false positive: a trusted domain now also covers its "www." form (and vice versa). Trusting "googletagmanager.com" no longer flags "www.googletagmanager.com" as a new script. CSP host matching is exact and does not imply www, so the policy now emits both.
-
-= 0.3.0 =
-* The scan now names the source of every script. Your own scripts are labeled by their WordPress plugin, theme, or core component (read from your actually installed plugins, so any plugin is recognized, not just popular ones), and outside scripts are tagged "external" next to the vendor. Much easier to recognize what runs on your checkout at a glance.
-
-= 0.2.1 =
-* The trusted list is now sticky. "Add anything new from my latest scan" merges new domains and never removes ones you already trust, so a script that is temporarily unavailable (or a manually-trusted domain) can no longer be dropped by a re-scan. Added a per-domain Remove button for deliberate pruning, and clarified that the list holds domains.
-
-= 0.2.0 =
-* Plain-language redesign for non-technical store owners. A 3-step guided setup (scan your checkout, mark scripts as trusted, turn on monitoring). Renamed screens: "Checkout Scripts" and "Alerts" (was Violations). The "Trust this" button on an alert adds a script to your trusted list and clears it. PCI/CSP wording moved into optional "why this matters" and "technical details" sections. No change to how monitoring works.
-
-= 0.1.3 =
-* Renamed the plugin to Checkout Script Monitor (display name). The tool monitors and inventories the scripts on your checkout (Report-Only, never blocks) rather than guarding or blocking them, and the name now reflects that. No functional change.
-
-= 0.1.2 =
-* Focus violation reports on off-baseline script LOADS (the drift signal), not the site's own inline scripts. Added 'unsafe-inline' to the Report-Only policy so the browser stops reporting the checkout's many legitimate inline blocks (no security effect, the policy is never enforced), and the report endpoint now drops inline/eval/data/blob reports as a safety net. The Alerts screen now shows only external hosts not in your confirmed baseline.
-
-= 0.1.1 =
-* Fix: the CSP Report-Only header now emits reliably on the cart/checkout pages. It was gated on a conditional (is_cart/is_checkout) evaluated too early in the request, so the header never went out. Moved header emission to template_redirect, where the page conditionals are reliable.
-
-= 0.1.0 =
-* Initial release: script inventory across home/shop/cart/checkout, plain-English PCI 6.4.3 readout, and optional CSP Report-Only monitoring with a self-baselined allowlist and local violation storage.
+= 1.0.0 =
+* First public release: checkout script inventory with a plain-English PCI DSS 6.4.3 readout, and optional Content-Security-Policy Report-Only drift monitoring for your cart and checkout.
