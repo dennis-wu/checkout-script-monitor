@@ -95,10 +95,21 @@ class CSM_Admin {
 			return $text;
 		}
 
+		// TODO (post-launch): once the plugin is listed on WordPress.org, replace this
+		// feedback line with a delayed, dismissible "leave a review" prompt — shown
+		// after the merchant has actually used monitoring for a while (e.g. cleared a
+		// first alert, or ~14 days in) — linking to
+		// https://wordpress.org/support/plugin/checkout-script-monitor/reviews/ .
+		// Before launch a review CTA has no valid destination and invites premature
+		// ratings, so we ask for direct feedback first.
+		$mailto = 'mailto:feedback@cybershieldstudio.com?subject=' . rawurlencode( 'Checkout Script Monitor feedback' );
+
 		return sprintf(
-			/* translators: 1: plugin name (bold). */
-			__( 'Enjoying %1$s? Thank you for using!', 'checkout-script-monitor' ),
-			'<strong>' . esc_html__( 'Checkout Script Monitor', 'checkout-script-monitor' ) . '</strong>'
+			/* translators: 1: plugin name (bold), 2: opening feedback-email link tag, 3: closing link tag. */
+			__( 'Enjoying %1$s? Found a bug or have an idea? %2$sEmail us%3$s.', 'checkout-script-monitor' ),
+			'<strong>' . esc_html__( 'Checkout Script Monitor', 'checkout-script-monitor' ) . '</strong>',
+			'<a href="' . esc_url( $mailto ) . '">',
+			'</a>'
 		);
 	}
 
