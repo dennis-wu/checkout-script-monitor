@@ -1,5 +1,5 @@
 === Checkout Script Monitor for WooCommerce ===
-Contributors: cybershieldstudio
+Contributors: dennishwu
 Tags: woocommerce, ecommerce security, pci compliance, checkout, card skimming
 Requires at least: 6.2
 Tested up to: 7.0
