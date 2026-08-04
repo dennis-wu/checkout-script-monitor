@@ -8,28 +8,28 @@
  * stored on the merchant's own site. The visitor IP and referrer are dropped at
  * ingest. Nothing leaves the site.
  *
- * @package Checkout_Script_Monitor
+ * @package CyberShield_Checkout_Script_Monitor
  */
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Class CSM_CSP.
+ * Class CSCSM_CSP.
  */
-class CSM_CSP {
+class CSCSM_CSP {
 
-	const REST_NS    = 'checkout-script-monitor/v1';
+	const REST_NS    = 'cybershield-checkout-script-monitor/v1';
 	const REST_ROUTE = '/csp-report';
 	const MAX_BODY   = 8192; // 8 KB cap on a report body.
 	const RATE_MAX   = 300;  // Max reports stored per minute (global).
 	const KEEP_ROWS  = 500;  // Prune the violations table to this many rows.
 
 	/**
-	 * @var CSM_Inventory
+	 * @var CSCSM_Inventory
 	 */
 	private $inventory;
 
-	public function __construct( CSM_Inventory $inventory ) {
+	public function __construct( CSCSM_Inventory $inventory ) {
 		$this->inventory = $inventory;
 	}
 
@@ -44,7 +44,7 @@ class CSM_CSP {
 	}
 
 	private function settings() {
-		$s = get_option( CSM_OPT_SETTINGS, array() );
+		$s = get_option( CSCSM_OPT_SETTINGS, array() );
 		return wp_parse_args( is_array( $s ) ? $s : array(), array( 'csp_report_only' => 0 ) );
 	}
 
@@ -59,7 +59,7 @@ class CSM_CSP {
 	 * @return array
 	 */
 	public function get_baseline() {
-		$b = get_option( CSM_OPT_BASELINE, array() );
+		$b = get_option( CSCSM_OPT_BASELINE, array() );
 		return is_array( $b ) ? $b : array();
 	}
 
@@ -93,7 +93,7 @@ class CSM_CSP {
 			'hosts'      => array_values( array_unique( $hosts ) ),
 			'created_at' => ! empty( $existing['created_at'] ) ? $existing['created_at'] : current_time( 'mysql' ),
 		);
-		update_option( CSM_OPT_BASELINE, $baseline, false );
+		update_option( CSCSM_OPT_BASELINE, $baseline, false );
 		return $baseline;
 	}
 
@@ -170,7 +170,7 @@ class CSM_CSP {
 	 */
 	public function receive_report( WP_REST_Request $request ) {
 		// Crude global rate limit to blunt floods (this endpoint is public).
-		$bucket = 'csm_rl_' . gmdate( 'YmdHi' );
+		$bucket = 'cscsm_rl_' . gmdate( 'YmdHi' );
 		$count  = (int) get_transient( $bucket );
 		if ( $count >= self::RATE_MAX ) {
 			return new WP_REST_Response( null, 429 );
@@ -307,7 +307,7 @@ class CSM_CSP {
 		}
 		$baseline['hosts']      = array_values( array_unique( $hosts ) );
 		$baseline['created_at'] = ! empty( $baseline['created_at'] ) ? $baseline['created_at'] : current_time( 'mysql' );
-		update_option( CSM_OPT_BASELINE, $baseline, false );
+		update_option( CSCSM_OPT_BASELINE, $baseline, false );
 		return true;
 	}
 
@@ -333,7 +333,7 @@ class CSM_CSP {
 				}
 			)
 		);
-		update_option( CSM_OPT_BASELINE, $baseline, false );
+		update_option( CSCSM_OPT_BASELINE, $baseline, false );
 	}
 
 	/**
@@ -354,7 +354,7 @@ class CSM_CSP {
 
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'csm_violations';
+		return $wpdb->prefix . 'cscsm_violations';
 	}
 
 	public static function install_table() {

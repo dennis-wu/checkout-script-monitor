@@ -1,4 +1,4 @@
-# Checkout Script Monitor for WooCommerce
+# CyberShield Checkout Script Monitor for WooCommerce
 
 A free, open-source WordPress/WooCommerce plugin that inventories the scripts on a
 merchant's checkout and shows where they stand on **PCI DSS 6.4.3**, in plain
@@ -17,7 +17,7 @@ affiliated with or endorsed by the PCI Security Standards Council.
 - **Drift monitoring** (off by default) — emits a `Content-Security-Policy-Report-Only`
   header on cart/checkout, built from the merchant's **trusted list** (their own
   observed scripts, never an opinionated "trusted sources" default), with a local REST
-  endpoint (`/wp-json/checkout-script-monitor/v1/csp-report`) storing the reports in the
+  endpoint (`/wp-json/cybershield-checkout-script-monitor/v1/csp-report`) storing the reports in the
   site's own database. New or changed scripts surface as **Alerts**. Visitor IP and
   referrer are dropped at ingest. Report-Only never blocks anything.
 
@@ -26,14 +26,14 @@ affiliated with or endorsed by the PCI Security Standards Council.
 **From a release zip**
 
 1. In WordPress: **Plugins → Add New Plugin → Upload Plugin**, choose
-   `checkout-script-monitor.zip`, **Install Now**, then **Activate**.
-2. A **Checkout Script Monitor** menu appears in the admin sidebar.
+   `cybershield-checkout-script-monitor.zip`, **Install Now**, then **Activate**.
+2. A **CyberShield Checkout Script Monitor** menu appears in the admin sidebar.
 
 **From source**
 
 ```bash
 git clone https://github.com/dennis-wu/checkout-script-monitor.git \
-  wp-content/plugins/checkout-script-monitor
+  wp-content/plugins/cybershield-checkout-script-monitor
 ```
 
 Then activate it from **Plugins**.
@@ -43,7 +43,7 @@ the cart/checkout pages).
 
 ## Usage
 
-1. **Checkout Script Monitor → Checkout Scripts** — run the short 3-step setup:
+1. **CyberShield Checkout Script Monitor → Checkout Scripts** — run the short 3-step setup:
    **Scan my checkout** to inventory the scripts, **mark them as trusted** (the
    known-good list), then **turn on monitoring**.
 2. Once monitoring is on, a new or changed script on the checkout appears under
@@ -64,7 +64,7 @@ the cart/checkout pages).
 ## Structure
 
 ```
-checkout-script-monitor.php   Bootstrap: header, constants, activation
+cybershield-checkout-script-monitor.php   Bootstrap: header, constants, activation
 includes/class-inventory.php  Scan + parse + classify + SRI + snapshot
 includes/class-csp.php        Report-Only header + REST report endpoint + storage
 includes/class-admin.php      Admin menus and screens

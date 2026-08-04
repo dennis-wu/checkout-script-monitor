@@ -2,17 +2,18 @@
 /**
  * Uninstall cleanup: remove options and the violations table.
  *
- * @package Checkout_Script_Monitor
+ * @package CyberShield_Checkout_Script_Monitor
  */
 
 defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-delete_option( 'csm_settings' );
-delete_option( 'csm_inventory' );
-delete_option( 'csm_baseline' );
-delete_option( 'csm_notice_dismissed' );
-delete_option( 'csm_db_version' );
+delete_option( 'cscsm_settings' );
+delete_option( 'cscsm_inventory' );
+delete_option( 'cscsm_baseline' );
+delete_option( 'cscsm_notice_dismissed' );
+delete_option( 'cscsm_db_version' );
 
 global $wpdb;
-$table = $wpdb->prefix . 'csm_violations';
-$wpdb->query( "DROP TABLE IF EXISTS `{$table}`" ); // phpcs:ignore WordPress.DB, PluginCheck.Security.DirectDB.UnescapedDBParameter -- dropping the plugin's own table on uninstall; trusted prefix-based identifier.
+$cscsm_table = $wpdb->prefix . 'cscsm_violations';
+$wpdb->query( "DROP TABLE IF EXISTS `{$cscsm_table}`" ); // phpcs:ignore WordPress.DB, PluginCheck.Security.DirectDB.UnescapedDBParameter -- dropping the plugin's own table on uninstall; trusted prefix-based identifier.
+unset( $cscsm_table );

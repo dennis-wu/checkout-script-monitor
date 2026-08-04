@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Minimal seed for the Checkout Script Monitor plugin-dev environment.
+# Minimal seed for the CyberShield Checkout Script Monitor plugin-dev environment.
 #
 # Gives you just enough store to exercise the plugin: two products, the
 # WooCommerce pages, and the built-in Cash-on-Delivery gateway (no payment

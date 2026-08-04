@@ -3,19 +3,23 @@
  * Script inventory: scans the merchant's OWN store pages and records the
  * external scripts loaded on them. No third-party or phone-home requests.
  *
- * @package Checkout_Script_Monitor
+ * @package CyberShield_Checkout_Script_Monitor
  */
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Class CSM_Inventory.
+ * Class CSCSM_Inventory.
  */
-class CSM_Inventory {
+class CSCSM_Inventory {
 
 	/**
 	 * Compact third-party catalog: host substring => array( category, label ).
 	 * Deliberately small. Unmatched third parties are still listed as "third party".
+	 *
+	 * RECOGNITION LIST ONLY: these hosts are string patterns used to put a
+	 * friendly vendor label on scripts already present on the merchant's own
+	 * pages. The plugin never loads, embeds, or connects to any of them.
 	 *
 	 * @return array<string,array{0:string,1:string}>
 	 */
@@ -80,7 +84,7 @@ class CSM_Inventory {
 				$url,
 				array(
 					'timeout'    => 15,
-					'user-agent' => 'CheckoutScriptMonitor/' . CSM_VERSION . ' (+https://cybershieldstudio.com)',
+					'user-agent' => 'CyberShield-Checkout-Script-Monitor/' . CSCSM_VERSION . ' (+https://cybershieldstudio.com)',
 				)
 			);
 
@@ -91,7 +95,7 @@ class CSM_Inventory {
 			$code = (int) wp_remote_retrieve_response_code( $res );
 			if ( $code >= 400 ) {
 				/* translators: %d: HTTP status code. */
-				$errors[ $label ] = sprintf( __( 'HTTP %d', 'checkout-script-monitor' ), $code );
+				$errors[ $label ] = sprintf( __( 'HTTP %d', 'cybershield-checkout-script-monitor' ), $code );
 				continue;
 			}
 
@@ -139,7 +143,7 @@ class CSM_Inventory {
 			'missing_sri' => $missing,
 			'errors'      => $errors,
 		);
-		update_option( CSM_OPT_INVENTORY, $snapshot, false );
+		update_option( CSCSM_OPT_INVENTORY, $snapshot, false );
 		return $snapshot;
 	}
 
@@ -244,16 +248,16 @@ class CSM_Inventory {
 	private function first_party_source( $src ) {
 		$path = strtolower( (string) wp_parse_url( $src, PHP_URL_PATH ) );
 		if ( false !== strpos( $path, '/wp-includes/js/jquery/' ) ) {
-			return __( 'jQuery (WordPress core)', 'checkout-script-monitor' );
+			return __( 'jQuery (WordPress core)', 'cybershield-checkout-script-monitor' );
 		}
 		if ( preg_match( '#/wp-(?:includes|admin)/#', $path ) ) {
-			return __( 'WordPress core', 'checkout-script-monitor' );
+			return __( 'WordPress core', 'cybershield-checkout-script-monitor' );
 		}
 		if ( preg_match( '#/wp-content/plugins/([^/]+)/#', $path, $m ) ) {
 			return $this->plugin_name( $m[1] );
 		}
 		if ( false !== strpos( $path, '/wp-content/mu-plugins/' ) ) {
-			return __( 'Must-use plugin', 'checkout-script-monitor' );
+			return __( 'Must-use plugin', 'cybershield-checkout-script-monitor' );
 		}
 		if ( preg_match( '#/wp-content/themes/([^/]+)/#', $path, $m ) ) {
 			return $this->theme_name( $m[1] );
@@ -304,7 +308,7 @@ class CSM_Inventory {
 			$name = $this->prettify_slug( $slug );
 		}
 		/* translators: %s: theme name. */
-		return sprintf( __( '%s (theme)', 'checkout-script-monitor' ), $name );
+		return sprintf( __( '%s (theme)', 'cybershield-checkout-script-monitor' ), $name );
 	}
 
 	private function prettify_slug( $slug ) {
@@ -317,7 +321,7 @@ class CSM_Inventory {
 	 * @return array
 	 */
 	public function get_snapshot() {
-		$snap = get_option( CSM_OPT_INVENTORY, array() );
+		$snap = get_option( CSCSM_OPT_INVENTORY, array() );
 		return is_array( $snap ) ? $snap : array();
 	}
 
